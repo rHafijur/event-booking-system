@@ -4,7 +4,7 @@ namespace Core\UseCases\Event;
 
 use Core\Repositories\EventRepository;
 
-class ListEvents
+class OrganizerListEvents
 {
     private EventRepository $eventRepository;
 
@@ -13,8 +13,8 @@ class ListEvents
         $this->eventRepository = $eventRepository;
     }
 
-    public function execute(int $page, int $pageSize, ?string $search = null, ?array $filters = []): array
+    public function execute(int $organizerId, int $page, int $pageSize, ?string $search = null, ?array $filters = []): array
     {
-        return $this->eventRepository->findAll($page, $pageSize);
+        return $this->eventRepository->findAllByOrganizerId($organizerId,$page, $pageSize);
     }
 }

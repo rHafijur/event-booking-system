@@ -33,6 +33,18 @@ class MySQLEventRepository implements EventRepository
         $rows = $stmt->fetchAll();
         return array_map([$this, 'mapToEntity'], $rows);
     }
+    public function findAllByOrganizerId(int $organizerId,int $page, int $limit): array
+    {
+        $offset = ($page - 1) * $limit;
+        $stmt = $this->db->prepare("SELECT * FROM events WHERE organizer_id = :organizer_id LIMIT :offset, :limit");
+        $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+        $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+        $stmt->execute([
+            'organizer_id' => $organizerId
+        ]);
+        $rows = $stmt->fetchAll();
+        return array_map([$this, 'mapToEntity'], $rows);
+    }
 
     public function create(Event $event): int
     {
