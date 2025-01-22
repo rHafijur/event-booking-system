@@ -1,11 +1,12 @@
 <?php
 
+namespace Infrastructure\Config;
 class Env
 {
     public static function load(string $path): void
     {
         if (!file_exists($path)) {
-            throw new RuntimeException("The .env file does not exist: $path");
+            throw new \RuntimeException("The .env file does not exist: $path");
         }
 
         $lines = file($path, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);

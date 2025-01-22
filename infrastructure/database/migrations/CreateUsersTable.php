@@ -1,5 +1,8 @@
 <?php
-require_once __DIR__.'/../Database.php';
+// require_once __DIR__.'/../Database.php';
+namespace Infrastructure\Database\Migrations;
+
+use Infrastructure\Database\Database;
 
 class CreateUsersTable
 {

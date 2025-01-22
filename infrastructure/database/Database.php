@@ -1,6 +1,10 @@
 <?php
 
-require_once __DIR__.'/../config/Env.php';
+// require_once __DIR__.'/../config/Env.php';
+namespace Infrastructure\Database;
+use PDO;
+use Infrastructure\Config\Env;
+
 class Database
 {
     private static ?PDO $connection = null;
@@ -12,7 +16,7 @@ class Database
                 Env::load(__DIR__ . '/../../.env');
 
                 $host = $_ENV['DB_HOST'] ?? 'localhost';
-                $db = $_ENV['DB_DATABASE'] ?? 'test';
+                $db = $_ENV['DB_NAME'] ?? 'test';
                 $user = $_ENV['DB_USERNAME'] ?? 'root';
                 $pass = $_ENV['DB_PASSWORD'] ?? '';
                 $charset = $_ENV['DB_CHARSET'] ?? 'utf8mb4';
@@ -25,8 +29,8 @@ class Database
                 ];
 
                 self::$connection = new PDO($dsn, $user, $pass, $options);
-            } catch (PDOException $e) {
-                throw new RuntimeException("Database connection failed: " . $e->getMessage());
+            } catch (\PDOException $e) {
+                throw new \RuntimeException("Database connection failed: " . $e->getMessage());
             }
         }
 
