@@ -1,0 +1,22 @@
+{
+    "name": "hafijur/event_booking_system",
+    "type": "project",
+    "authors": [
+        {
+            "name": "Hafijur Rahman",
+            "email": "bmsakib09.hr@gmail.com"
+        }
+    ],
+    "require": {},
+    "autoload": {
+
+        "psr-4": {
+
+            "Core\\": "core/",
+            "App\\": "app/",
+            "Infrastructure\\": "infrastructure/"
+
+        }
+
+    }
+}
