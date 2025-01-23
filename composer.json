@@ -14,8 +14,7 @@
 
             "Core\\": "core/",
             "App\\": "app/",
-            "Infrastructure\\": "infrastructure/",
-            "Infrastructure\\Migrations\\": "infrastructure/migrations"
+            "Infrastructure\\": "infrastructure/"
 
         }
 

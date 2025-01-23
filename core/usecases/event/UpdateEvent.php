@@ -15,7 +15,7 @@ class UpdateEvent
         $this->eventRepository = $eventRepository;
     }
 
-    public function execute(int $eventId, string $name, string $description, int $capacity, string $eventDate, string $bookingDeadline, ?string $image, string $venue, float $ticketPrice, int $organizerId, string $createdAt): Event
+    public function execute(int $eventId, string $name, string $description, int $capacity, string $eventDate, string $bookingDeadline, ?string $image, string $venue, float $ticketPrice): Event
     {
         // Fetch the event
         $event = $this->eventRepository->findById($eventId);
@@ -32,8 +32,8 @@ class UpdateEvent
         $event->setImage($image);
         $event->setVenue($venue);
         $event->setTicketPrice($ticketPrice);
-        $event->setOrganizerId($organizerId);
-        $event->setCreatedAt(new \DateTime($createdAt));
+        $event->setOrganizerId($event->getOrganizerId());
+        $event->setCreatedAt($event->getCreatedAt());
 
         // Save the updated event
         $this->eventRepository->update($event);
