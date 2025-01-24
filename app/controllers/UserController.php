@@ -29,12 +29,40 @@ class UserController
         $name = $_POST['name'];
         $email = $_POST['email'];
         $password = $_POST['password'];
+        $confirmPassword = $_POST['confirm_password'];
+        $messages = [];
+        if(empty($name)){
+            $messages[]="Name is required";
+        }
+        if(empty($email)){
+            $messages[]="Email is required";
+        }elseif(!filter_var($email, FILTER_VALIDATE_EMAIL)){
+            $messages[]="Email is invalid";
+        }
+        
+        if(empty($password)){
+            $messages[]="Password is required";
+        }elseif($password != $confirmPassword){
+            $messages[]="Password is not matched with the confirm password";
+        }
+
+        if(!empty($messages)){
+            foreach($messages as $message){
+                setFlashMessage('warning', $message);
+            }
+            setOld('name', $name);
+            setOld('email', $email);
+            header('Location: /register');
+            exit;
+        }
 
         try {
             $this->registerUser->execute($name, $email, $password);
+            setFlashMessage('success','Registration successfull');
             header('Location: /login');
         } catch (\Exception $e) {
-            echo "Error: " . $e->getMessage();
+            setFlashMessage('danger', $e->getMessage());
+            header('Location: /register');
         }
     }
 
@@ -52,7 +80,8 @@ class UserController
             $result = $this->loginUser->execute($email, $password);
             header('Location: /dashboard');
         } catch (\Exception $e) {
-            echo "Error: " . $e->getMessage();
+            setFlashMessage('danger', $e->getMessage());
+            header('Location: /login');
         }
     }
 

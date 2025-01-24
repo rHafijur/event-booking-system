@@ -16,11 +16,9 @@ class RegisterUser
 
     public function execute(string $name, string $email, string $password): User
     {
-        // Hash the password
         $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
 
-        // Create a user entity
-        $user = new User($name, $name, $email, $hashedPassword);
+        $user = new User($name, $email, $hashedPassword, 'user');
 
         // Save user in repository
         $userId = $this->userRepository->create($user);

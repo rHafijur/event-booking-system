@@ -61,7 +61,7 @@ class MySQLUserRepository implements UserRepository
 
     private function mapToEntity(array $row): User
     {
-        $user = new User( $row['name'], $row['email'], $row['role']);
+        $user = new User( $row['name'], $row['email'], $row['password'], $row['role']);
         $user->setId($row['id']);
         return $user;
     }

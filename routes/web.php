@@ -20,6 +20,7 @@ $router = [
     // User Authentication
     'GET /login' => function (): void {
         $controller = ControllerFactory::getUserController();
+        $GLOBALS['csrf_token'] = CsrfProtection::generateToken();
         $controller->loginView();
     },
     'POST /login' => function (): void {
@@ -36,6 +37,7 @@ $router = [
     },
     'GET /register' => function (): void {
         $controller = ControllerFactory::getUserController();
+        $GLOBALS['csrf_token'] = CsrfProtection::generateToken();
         $controller->registerView();
     },
     'POST /register' => function (): void {
@@ -64,15 +66,44 @@ $router = [
             $controller->create();
         });
     },
+    'GET /event/{id}' => function (array $params): void {
+        applyMiddleware([AuthenticatedMiddleware::class], function () use ($params): void {
+            $controller = ControllerFactory::getEventController();
+            $controller->details($params['id']);
+        });
+    },
 ];
 
-
+// Process the Request
 $requestMethod = $_SERVER['REQUEST_METHOD'];
 $requestUri = strtok($_SERVER['REQUEST_URI'], '?');
-$routeKey = "$requestMethod $requestUri";
 
-if (array_key_exists($routeKey, $router)) {
-    $router[$routeKey]();
+// Match the Route with Parameters
+function matchRoute(string $method, string $uri, array $routes)
+{
+    foreach ($routes as $route => $callback) {
+        [$routeMethod, $routePattern] = explode(' ', $route, 2);
+
+        if ($method !== $routeMethod) {
+            continue;
+        }
+
+        // Convert route patterns to regex
+        $pattern = preg_replace('#\{(\w+)\}#', '(?P<$1>[^/]+)', $routePattern);
+        $pattern = "#^$pattern$#";
+
+        if (preg_match($pattern, $uri, $matches)) {
+            return [$callback, array_filter($matches, 'is_string', ARRAY_FILTER_USE_KEY)];
+        }
+    }
+
+    return [null, []];
+}
+
+[$callback, $params] = matchRoute($requestMethod, $requestUri, $router);
+
+if ($callback) {
+    $callback($params);
 } else {
     http_response_code(404);
     echo '404 - Page Not Found';

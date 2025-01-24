@@ -19,7 +19,7 @@ class LoginUser
         // Fetch user by email
         $user = $this->userRepository->findByEmail($email);
         if (!$user) {
-            throw new Exception("Invalid email or password.");
+            throw new Exception("Invalid password or email.");
         }
 
         // Verify the password
@@ -28,7 +28,7 @@ class LoginUser
         }
 
         // Generate a session or token
-        $sessionId = $this->createSession($user->getId());
+        $sessionId = $this->createSession($user->getId(), $user->getRole());
 
         // Return user details and session information
         return [
@@ -37,11 +37,11 @@ class LoginUser
         ];
     }
 
-    private function createSession(int $userId): string
+    private function createSession(int $userId, string $role): string
     {
-        // You can replace this with your session/token creation logic
         session_start();
         $_SESSION['user_id'] = $userId;
+        $_SESSION['role'] = $role;
         return session_id();
     }
 }
