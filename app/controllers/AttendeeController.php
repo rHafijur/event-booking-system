@@ -5,6 +5,7 @@ namespace App\Controllers;
 use Core\UseCases\Attendee\RegisterAttendee;
 use Core\UseCases\Attendee\ListAttendeesForEvent;
 use Core\UseCases\Event\GetEventDetails;
+use DateTime;
 
 class AttendeeController
 {
@@ -36,7 +37,7 @@ class AttendeeController
         $email = $_POST['email'];
 
         try {
-            $this->registerAttendee->execute($eventId, $name, $email);
+            $this->registerAttendee->execute($eventId, $name, $email, new DateTime());
             header('Location: /events/' . $eventId . '/attendees');
         } catch (\Exception $e) {
             echo "Error: " . $e->getMessage();

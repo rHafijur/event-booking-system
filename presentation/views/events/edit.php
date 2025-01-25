@@ -57,7 +57,7 @@
             <div class="mb-3">
                 <label for="image" class="form-label">Event Image</label>
                 <input type="file" class="form-control"  id="image" name="image" accept="image/*">
-                <div class="form-text">Optional: Upload an image for the event.</div>
+                <div class="form-text">Optional: Upload an image to replace the existing one.</div>
             </div>
 
             <input type="hidden" name="organizerId" value="[Organizer ID]">

@@ -110,4 +110,53 @@ function renderPaginationWithQueryParams(int $currentPage, int $totalPages, stri
     return $html;
 }
 
+function uploadImage($uploadPath, $inputName) {
+    if (!isset($_FILES[$inputName])) {
+        throw new Exception("No file uploaded.");
+    }
+
+    if ($_FILES[$inputName]["error"] != 0) {
+        throw new Exception("File upload error: " . $_FILES[$inputName]["error"]);
+    }
+
+    $fileType = strtolower(pathinfo($_FILES[$inputName]["name"], PATHINFO_EXTENSION));
+    $allowedTypes = ["jpg", "jpeg", "png", "gif"];
+
+    if (!in_array($fileType, $allowedTypes)) {
+        throw new Exception("Only JPG, JPEG, PNG, and GIF files are allowed.");
+    }
+
+    if (!is_dir($uploadPath)) {
+        if (!mkdir($uploadPath, 0755, true)) {
+            throw new Exception("Failed to create upload directory.");
+        }
+    }
+
+    $randomString = bin2hex(random_bytes(8));
+    $fileName = $randomString . "." . $fileType;
+    $targetFilePath = $uploadPath . $fileName;
+
+    if (!move_uploaded_file($_FILES[$inputName]["tmp_name"], $targetFilePath)) {
+        throw new Exception("Failed to move uploaded file.");
+    }
+
+    return $targetFilePath;
+}
+
+function deleteFile($filePath) {
+    if (!file_exists($filePath)) {
+        throw new Exception("File does not exist: " . $filePath);
+    }
+
+    if (!is_writable($filePath)) {
+        throw new Exception("File is not writable: " . $filePath);
+    }
+
+    if (!unlink($filePath)) {
+        throw new Exception("Failed to delete file: " . $filePath);
+    }
+
+    return true;
+}
+
 

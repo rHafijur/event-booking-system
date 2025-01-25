@@ -100,6 +100,16 @@ class EventController
             $errors[] = "Ticket price must be a non-negative number.";
         }
 
+        if(isset($_FILES['image'])){
+            try{
+                $image = uploadImage('storage/images/','image');
+            }catch(\Exception $e){
+                $errors[] = $e->getMessage();
+            }
+        }else{
+            $image = null;
+        }
+
         if(count($errors)){
             http_response_code(400);
             echo json_encode(['errors'=> $errors]);
@@ -109,7 +119,7 @@ class EventController
         $user = $this->getAuthUser->execute();
 
         try {
-            $this->createEvent->execute($name, $description, $capacity, $eventDate, $bookingDeadline, null, $venue, $ticketPrice, $user->getId(), $createdAt);
+            $this->createEvent->execute($name, $description, $capacity, $eventDate, $bookingDeadline, $image, $venue, $ticketPrice, $user->getId(), $createdAt);
             header('Location: /events');
         } catch (\Exception $e) {
             echo "Error: " . $e->getMessage();
@@ -131,9 +141,11 @@ class EventController
     public function update(int $eventId): void
     {
         $errors = [];
+        $previousImage = null;
         try {
             $user = $this->getAuthUser->execute();
             $event = $this->getEventDetails->execute($eventId, $user->getId());
+            $previousImage = $event->getImage();
         } catch (\Exception $e) {
             $errors[] = $e->getMessage();
         }
@@ -191,6 +203,16 @@ class EventController
             $errors[] = "Ticket price must be a non-negative number.";
         }
 
+        if(isset($_FILES['image'])){
+            try{
+                $image = uploadImage('storage/images/','image');
+            }catch(\Exception $e){
+                $errors[] = $e->getMessage();
+            }
+        }else{
+            $image = null;
+        }
+
         if(count($errors)){
             http_response_code(400);
             echo json_encode(['errors'=> $errors]);
@@ -198,7 +220,13 @@ class EventController
         }
 
         try {
-            $this->updateEvent->execute($eventId, $name, $description, $capacity, $eventDate, $bookingDeadline, null, $venue, $ticketPrice);
+            $this->updateEvent->execute($eventId, $name, $description, $capacity, $eventDate, $bookingDeadline, $image, $venue, $ticketPrice);
+            
+            if($previousImage){
+                try{
+                    deleteFile($previousImage);
+                }catch(\Exception $_){}
+            }
             header('Location: /events');
         } catch (\Exception $e) {
             echo "Error: " . $e->getMessage();
