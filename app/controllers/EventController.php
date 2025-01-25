@@ -118,12 +118,26 @@ class EventController
 
     public function edit(int $id): void
     {
-        $event = $this->getEventDetails->execute($id);
+        try {
+            $user = $this->getAuthUser->execute();
+            $event = $this->getEventDetails->execute($id, $user->getId());
+        } catch (\Exception $e) {
+            echo "Error: " . $e->getMessage();
+            exit;
+        }
         require __DIR__."/../../presentation/views/events/edit.php";
     }
 
     public function update(int $eventId): void
     {
+        $errors = [];
+        try {
+            $user = $this->getAuthUser->execute();
+            $event = $this->getEventDetails->execute($eventId, $user->getId());
+        } catch (\Exception $e) {
+            $errors[] = $e->getMessage();
+        }
+
         $name = $_POST['name'];
         $description = $_POST['description'];
         $capacity = $_POST['capacity'];
@@ -132,7 +146,6 @@ class EventController
         $venue = $_POST['venue'];
         $ticketPrice = $_POST['ticket_price'];
 
-        $errors = [];
 
         if (empty($name)) {
             $errors[] = "Event name is required.";
@@ -223,7 +236,8 @@ class EventController
     public function details(int $eventId): void
     {
         try {
-            $event = $this->getEventDetails->execute($eventId);
+            $user = $this->getAuthUser->execute();
+            $event = $this->getEventDetails->execute($eventId, $user->getId());
             $attendees = $this->listAttendeesForEvent->execute($eventId);
             require __DIR__.'/../../presentation/views/events/details.php';
         } catch (\Exception $e) {

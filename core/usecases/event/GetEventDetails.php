@@ -15,9 +15,9 @@ class GetEventDetails
         $this->eventRepository = $eventRepository;
     }
 
-    public function execute(int $eventId): Event
+    public function execute(int $eventId, ?int $organizerId = null): Event
     {
-        $event = $this->eventRepository->findById($eventId);
+        $event = $this->eventRepository->findById($eventId, $organizerId);
         if (!$event) {
             throw new Exception("Event not found");
         }

@@ -15,10 +15,18 @@ class MySQLEventRepository implements EventRepository
         $this->db = $db;
     }
 
-    public function findById(int $id): ?Event
+    public function findById(int $id, ?int $organizerId = null): ?Event
     {
-        $stmt = $this->db->prepare("SELECT * FROM events WHERE id = :id");
-        $stmt->execute(['id' => $id]);
+        $params = ['id' => $id];
+        $query = "SELECT * FROM events WHERE id = :id";
+
+        if($organizerId){
+            $query.=" AND organizer_id = :organizer_id";
+            $params['organizer_id'] = $organizerId;
+        }
+
+        $stmt = $this->db->prepare($query);
+        $stmt->execute($params);
         $row = $stmt->fetch();
         return $row ? $this->mapToEntity($row) : null;
     }

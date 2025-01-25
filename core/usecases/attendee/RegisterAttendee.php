@@ -5,6 +5,7 @@ namespace Core\UseCases\Attendee;
 use Core\Repositories\AttendeeRepository;
 use Core\Repositories\EventRepository;
 use Core\Entities\Attendee;
+use DateTime;
 use Exception;
 
 class RegisterAttendee
@@ -18,7 +19,7 @@ class RegisterAttendee
         $this->eventRepository = $eventRepository;
     }
 
-    public function execute(int $eventId, string $name, string $email): Attendee
+    public function execute(int $eventId, string $name, string $email, DateTime $registeredAt): Attendee
     {
         // Validate event
         $event = $this->eventRepository->findById($eventId);
@@ -33,7 +34,7 @@ class RegisterAttendee
         }
 
         // Register attendee
-        $attendee = new Attendee( $eventId, $name, $email);
+        $attendee = new Attendee( $eventId, $name, $email, $registeredAt);
         $attendeeId = $this->attendeeRepository->register($attendee);
         $attendee->setId($attendeeId);
 

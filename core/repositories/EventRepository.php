@@ -6,7 +6,7 @@ use Core\Entities\Event;
 
 interface EventRepository
 {
-    public function findById(int $id): ?Event;
+    public function findById(int $id, ?int $organizerId = null): ?Event;
 
     public function findAll(int $page, int $limit): array;
 
