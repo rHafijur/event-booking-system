@@ -48,9 +48,10 @@ class MySQLAttendeeRepository implements AttendeeRepository
     private function mapToEntity(array $row): Attendee
     {
         $attendee = new Attendee(
-            $row['event_id'],
             $row['name'],
             $row['email'],
+            $row['event_id'],
+            new \Datetime($row['registered_at']),
         );
 
         $attendee->setId($row['id']);

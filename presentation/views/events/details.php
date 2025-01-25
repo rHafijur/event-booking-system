@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Event Details</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="#">EventManager</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/dashboard">Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/logout">Logout</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Event Details Content -->
+    <div class="container my-5">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1>Event Details</h1>
+            <a href="/events" class="btn btn-secondary">Back to Events</a>
+        </div>
+
+        <!-- Event Information -->
+        <div class="card mb-4">
+            <div class="card-body">
+                <h2 class="card-title">Event Name: <span class="text-primary"><?= htmlspecialchars($event->getName()) ?></span></h2>
+                <p class="card-text"><strong>Venue:</strong> <?= htmlspecialchars($event->getVenue()) ?></p>
+                <p class="card-text"><strong>Description:</strong> <?= htmlspecialchars($event->getDescription()) ?></p>
+                <p class="card-text"><strong>Event Date:</strong> <?= $event->getEventDate()->format('d/M/Y') ?></p>
+                <p class="card-text"><strong>Booking Deadline:</strong> <?= $event->getBookingDeadline()->format('d/M/Y') ?></p>
+                <p class="card-text"><strong>Capacity:</strong> <?= htmlspecialchars($event->getCapacity()) ?></p>
+                <p class="card-text"><strong>Ticket Price:</strong> $<?= htmlspecialchars($event->getTicketPrice()) ?></p>
+                <!-- <p class="card-text"><strong>Organizer:</strong> John Doe</p> -->
+                <div class="text-end">
+                    <a href="/event/<?= htmlspecialchars($event->getId()) ?>/edit" class="btn btn-warning">Edit Event</a>
+                    <form method="POST" action="/event/delete?id=1" class="d-inline">
+                        <button type="submit" class="btn btn-danger">Delete Event</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Attendee List -->
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h4>Attendee List</h4>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>#</th>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Registered At</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach($attendees as $index => $attendee): ?>
+                                <tr>
+                                    <td><?= $index + 1 ?></td>
+                                    <td><?= htmlspecialchars($attendee->getName()) ?> </td>
+                                    <td><?= htmlspecialchars($attendee->getEmail()) ?></td>
+                                    <td><?= $attendee->getRegisteredAt()->format('d/M/Y H:i:s') ?></td>
+                                </tr>
+                            <?php endforeach ?>
+                            <?php if(count($attendees) == 0): ?>
+                                <tr>
+                                    <td colspan="5" class="text-center">No attendees registered yet.</td>
+                                </tr>
+                            <?php endif ?>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
