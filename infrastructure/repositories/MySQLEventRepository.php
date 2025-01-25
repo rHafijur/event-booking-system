@@ -37,14 +37,19 @@ class MySQLEventRepository implements EventRepository
     {
         $offset = ($page - 1) * $limit;
 
-        $query = "SELECT * FROM events WHERE organizer_id = :organizer_id";
+        $query = "SELECT events.* FROM events ";
 
-        $countQuery = "SELECT COUNT(*) AS total FROM events WHERE organizer_id = :organizer_id";
+        $countQuery = "SELECT COUNT(events.id) AS total FROM events ";
+
+        $organizerCondition = "WHERE events.organizer_id = :organizer_id";
 
         if (!empty($search)) {
-            $searchCondition = " AND (name LIKE :search_name OR description LIKE :search_description OR venue LIKE :search_venue)";
+            $searchCondition = "LEFT JOIN attendees on attendees.event_id = events.id $organizerCondition AND (events.name LIKE :search_name OR events.description LIKE :search_description OR events.venue LIKE :search_venue OR attendees.name LIKE :search_attendee_name OR attendees.email LIKE :search_attendee_email)";
             $query .= $searchCondition;
             $countQuery .= $searchCondition;
+        }else{
+            $query .= $organizerCondition;
+            $countQuery .= $organizerCondition;
         }
 
         if (!empty($orderBy)) {
@@ -65,6 +70,8 @@ class MySQLEventRepository implements EventRepository
             $countStmt->bindValue(':search_name', '%' . $search . '%', PDO::PARAM_STR);
             $countStmt->bindValue(':search_description', '%' . $search . '%', PDO::PARAM_STR);
             $countStmt->bindValue(':search_venue', '%' . $search . '%', PDO::PARAM_STR);
+            $countStmt->bindValue(':search_attendee_name', '%' . $search . '%', PDO::PARAM_STR);
+            $countStmt->bindValue(':search_attendee_email', '%' . $search . '%', PDO::PARAM_STR);
         }
         $countStmt->execute();
         $totalRecords = (int)$countStmt->fetchColumn();
@@ -75,6 +82,8 @@ class MySQLEventRepository implements EventRepository
             $stmt->bindValue(':search_name', '%' . $search . '%', PDO::PARAM_STR);
             $stmt->bindValue(':search_description', '%' . $search . '%', PDO::PARAM_STR);
             $stmt->bindValue(':search_venue', '%' . $search . '%', PDO::PARAM_STR);
+            $stmt->bindValue(':search_attendee_name', '%' . $search . '%', PDO::PARAM_STR);
+            $stmt->bindValue(':search_attendee_email', '%' . $search . '%', PDO::PARAM_STR);
         }
         $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
         $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);

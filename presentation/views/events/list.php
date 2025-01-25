@@ -36,7 +36,7 @@
         <!-- Filter/Search Form -->
         <form method="GET" action="/events" class="row g-3 mb-4">
             <div class="col-md-4">
-                <input type="text" name="search" class="form-control" placeholder="Search by name or venue" value="">
+                <input type="text" value="<?= $_GET['search']?? '' ?>" name="search" class="form-control" placeholder="Search across the events and attendees" value="">
             </div>
             <div class="col-md-3">
                 <select name="order_by" class="form-select">
