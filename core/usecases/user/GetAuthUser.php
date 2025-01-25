@@ -21,7 +21,7 @@ class GetAuthUser
         // echo $_SESSION['user_id'];
         // die();
 
-        if($userId = $_SESSION['user_id']){
+        if($userId = $_SESSION['user_id']?? null){
             return $this->userRepository->findById($userId);
         }
 
