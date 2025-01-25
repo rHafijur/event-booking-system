@@ -33,22 +33,67 @@ class MySQLEventRepository implements EventRepository
         $rows = $stmt->fetchAll();
         return array_map([$this, 'mapToEntity'], $rows);
     }
-    public function findAllByOrganizerId(int $organizerId,int $page, int $limit): array
+    public function findAllByOrganizerId(int $organizerId, int $page, int $limit, ?string $search, ?string $orderBy): array
     {
         $offset = ($page - 1) * $limit;
-        $stmt = $this->db->prepare("SELECT * FROM events WHERE organizer_id = :organizer_id LIMIT :offset, :limit");
+
+        $query = "SELECT * FROM events WHERE organizer_id = :organizer_id";
+
+        $countQuery = "SELECT COUNT(*) AS total FROM events WHERE organizer_id = :organizer_id";
+
+        if (!empty($search)) {
+            $searchCondition = " AND (name LIKE :search_name OR description LIKE :search_description OR venue LIKE :search_venue)";
+            $query .= $searchCondition;
+            $countQuery .= $searchCondition;
+        }
+
+        if (!empty($orderBy)) {
+            [$column, $direction] = explode('-', $orderBy, 2) + [null, null];
+            $allowedColumns = ['name', 'event_date', 'capacity'];
+            $allowedDirections = ['ASC', 'DESC'];
+
+            if (in_array($column, $allowedColumns, true) && in_array($direction, $allowedDirections, true)) {
+                $query .= " ORDER BY $column $direction";
+            }
+        }
+
+        $query .= " LIMIT :offset, :limit";
+
+        $countStmt = $this->db->prepare($countQuery);
+        $countStmt->bindValue(':organizer_id', $organizerId, PDO::PARAM_INT);
+        if (!empty($search)) {
+            $countStmt->bindValue(':search_name', '%' . $search . '%', PDO::PARAM_STR);
+            $countStmt->bindValue(':search_description', '%' . $search . '%', PDO::PARAM_STR);
+            $countStmt->bindValue(':search_venue', '%' . $search . '%', PDO::PARAM_STR);
+        }
+        $countStmt->execute();
+        $totalRecords = (int)$countStmt->fetchColumn();
+
+        $stmt = $this->db->prepare($query);
+        $stmt->bindValue(':organizer_id', $organizerId, PDO::PARAM_INT);
+        if (!empty($search)) {
+            $stmt->bindValue(':search_name', '%' . $search . '%', PDO::PARAM_STR);
+            $stmt->bindValue(':search_description', '%' . $search . '%', PDO::PARAM_STR);
+            $stmt->bindValue(':search_venue', '%' . $search . '%', PDO::PARAM_STR);
+        }
         $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
         $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
-        $stmt->execute([
-            'organizer_id' => $organizerId
-        ]);
+        $stmt->execute();
+
         $rows = $stmt->fetchAll();
-        return array_map([$this, 'mapToEntity'], $rows);
+        $events = array_map([$this, 'mapToEntity'], $rows);
+
+        return [
+            'events' => $events,
+            'totalRecords' => $totalRecords,
+            'totalPages' => ceil($totalRecords / $limit),
+            'currentPage' => $page
+        ];
     }
 
     public function create(Event $event): int
     {
-        $stmt = $this->db->prepare("INSERT INTO events (name, description, capacity, event_date, booking_deadline, image, venue, ticket_price, organizer_id, created_at) VALUES (:name, :description, :capacity, :event_date, :booking_deadline, :image, :venue, ticket_price, :organizer_id, :created_at)");
+        $stmt = $this->db->prepare("INSERT INTO events (name, description, capacity, event_date, booking_deadline, image, venue, ticket_price, organizer_id, created_at) VALUES (:name, :description, :capacity, :event_date, :booking_deadline, :image, :venue, :ticket_price, :organizer_id, :created_at)");
         $stmt->execute([
             'name' => $event->getName(),
             'description' => $event->getDescription(),
@@ -88,7 +133,7 @@ class MySQLEventRepository implements EventRepository
 
     private function mapToEntity(array $row): Event
     {
-        $event = new Event($row['name'], $row['description'], $row['capacity'],  new \DateTime($row['event_date']), new \DateTime($row['booking_deadline']), $row['image'], $row['venue'], $row['ticket_price'], $row['organizar_id'], new \DateTime($row['created_at']));
+        $event = new Event($row['name'], $row['description'], $row['capacity'],  new \DateTime($row['event_date']), new \DateTime($row['booking_deadline']), $row['image'], $row['venue'], $row['ticket_price'], $row['organizer_id'], new \DateTime($row['created_at']));
         $event->setId($row['id']);
         return $event;
     }

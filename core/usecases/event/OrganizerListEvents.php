@@ -13,8 +13,8 @@ class OrganizerListEvents
         $this->eventRepository = $eventRepository;
     }
 
-    public function execute(int $organizerId, int $page, int $pageSize, ?string $search = null, ?array $filters = []): array
+    public function execute(int $organizerId, int $page, int $pageSize, ?string $search, ?string $orderBy): array
     {
-        return $this->eventRepository->findAllByOrganizerId($organizerId,$page, $pageSize);
+        return $this->eventRepository->findAllByOrganizerId($organizerId,$page, $pageSize, $search, $orderBy);
     }
 }

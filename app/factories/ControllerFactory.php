@@ -2,20 +2,24 @@
 
 namespace App\Factories;
 
+use App\Controllers\LandingPageController;
 use Core\UseCases\Attendee\ListAttendeesForEvent;
 use Core\UseCases\Attendee\RegisterAttendee;
 use Core\UseCases\Event\CreateEvent;
 use Core\UseCases\Event\ListEvents;
+use Core\Usecases\User\GetAuthUser;
 use Infrastructure\Repositories\MySQLAttendeeRepository;
 use PDO;
 use App\Controllers\UserController;
 use App\Controllers\EventController;
 use Infrastructure\Database\Database;
 use App\Controllers\AttendeeController;
+use App\Controllers\DashboardController;
 use Core\Repositories\AttendeeRepository;
 use Core\Repositories\EventRepository;
 use Core\UseCases\Event\DeleteEvent;
 use Core\UseCases\Event\GetEventDetails;
+use Core\UseCases\Event\OrganizerListEvents;
 use Core\UseCases\Event\UpdateEvent;
 use Infrastructure\Repositories\MySQLUserRepository;
 use Core\UseCases\User\LoginUser;
@@ -31,6 +35,11 @@ class ControllerFactory
         return $db->getConnection();
     }
 
+    private static function getUserRepository(PDO $db): MySQLUserRepository
+    {
+        return new MySQLUserRepository($db);
+    }
+    
     private static function getAttendeeRepository(PDO $db): AttendeeRepository
     {
         return new MySQLAttendeeRepository($db);
@@ -41,10 +50,26 @@ class ControllerFactory
         return new MySQLEventRepository($db);
     }
 
+    public static function getLandingPageController()
+    {
+        $conn = static::getDbConn();
+        $userRepository = static::getUserRepository($conn);
+        $getAuthUser = new GetAuthUser($userRepository);
+        return new LandingPageController($getAuthUser);
+    }
+    
+    public static function getDashboardController()
+    {
+        $conn = static::getDbConn();
+        $userRepository = static::getUserRepository($conn);
+        $getAuthUser = new GetAuthUser($userRepository);
+        return new DashboardController($getAuthUser);
+    }
+
     public static function getUserController()
     {
         $conn = static::getDbConn();
-        $userRepository = new MySQLUserRepository($conn);
+        $userRepository = self::getUserRepository($conn);
         $loginUser = new LoginUser($userRepository);
         $registerUser = new RegisterUser($userRepository);
         $logoutUser = new LogoutUser();
@@ -59,10 +84,13 @@ class ControllerFactory
         $createEvent = new CreateEvent($eventRepository);
         $updateEvent = new UpdateEvent($eventRepository);
         $deleteEvent = new DeleteEvent($eventRepository);
-        $listEvents = new ListEvents($eventRepository);
+        // $listEvents = new ListEvents($eventRepository);
+        $organizerListEvents = new OrganizerListEvents($eventRepository);
         $getEventDetails = new GetEventDetails($eventRepository);
         $listAttendeesForEvent = new ListAttendeesForEvent($attendeeRepository);
-        return new EventController($createEvent, $updateEvent, $deleteEvent, $listEvents, $getEventDetails, $listAttendeesForEvent);
+        $userRepository = static::getUserRepository($conn);
+        $getAuthUser = new GetAuthUser($userRepository);
+        return new EventController($createEvent, $updateEvent, $deleteEvent, $organizerListEvents, $getEventDetails, $listAttendeesForEvent, $getAuthUser);
     }
 
     public static function getAttendeeController()

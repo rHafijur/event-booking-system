@@ -80,6 +80,7 @@ class UserController
             $result = $this->loginUser->execute($email, $password);
             header('Location: /dashboard');
         } catch (\Exception $e) {
+            setOld('email',$email);
             setFlashMessage('danger', $e->getMessage());
             header('Location: /login');
         }

@@ -39,7 +39,9 @@ class LoginUser
 
     private function createSession(int $userId, string $role): string
     {
-        session_start();
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
         $_SESSION['user_id'] = $userId;
         $_SESSION['role'] = $role;
         return session_id();

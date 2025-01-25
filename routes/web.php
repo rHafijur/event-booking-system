@@ -17,6 +17,10 @@ function applyMiddleware(array $middlewares, callable $callback)
 
 // Routes
 $router = [
+    'GET /' => function (): void {
+        $controller = ControllerFactory::getLandingPageController();
+        $controller->index();
+    },
     // User Authentication
     'GET /login' => function (): void {
         $controller = ControllerFactory::getUserController();
@@ -47,6 +51,13 @@ $router = [
         });
     },
 
+    'GET /dashboard' => function (): void {
+        applyMiddleware([AuthenticatedMiddleware::class], function (): void {
+            $controller = ControllerFactory::getDashboardController();
+            $controller->index();
+        });
+    },
+
     // Event Management
     'GET /events' => function (): void {
         applyMiddleware([AuthenticatedMiddleware::class], function (): void {
@@ -56,6 +67,7 @@ $router = [
     },
     'GET /event/create' => function (): void {
         applyMiddleware([AuthenticatedMiddleware::class], function (): void {
+            $GLOBALS['csrf_token'] = CsrfProtection::generateToken();
             $controller = ControllerFactory::getEventController();
             $controller->createView();
         });
@@ -70,6 +82,19 @@ $router = [
         applyMiddleware([AuthenticatedMiddleware::class], function () use ($params): void {
             $controller = ControllerFactory::getEventController();
             $controller->details($params['id']);
+        });
+    },
+    'GET /event/{id}/edit' => function (array $params): void {
+        applyMiddleware([AuthenticatedMiddleware::class], function () use ($params): void {
+            $GLOBALS['csrf_token'] = CsrfProtection::generateToken();
+            $controller = ControllerFactory::getEventController();
+            $controller->edit($params['id']);
+        });
+    },
+    'POST /event/{id}/update' => function (array $params): void {
+        applyMiddleware([AuthenticatedMiddleware::class, CsrfProtection::class], function () use ($params): void {
+            $controller = ControllerFactory::getEventController();
+            $controller->update($params['id']);
         });
     },
 ];
