@@ -15,7 +15,7 @@
                 <h2 class="text-center mb-4">Login</h2>
                 <form action="/login" method="POST">
                     <!-- CSRF Token -->
-                    <input type="hidden" name="_csrf_token" value="<?php echo htmlspecialchars( $GLOBALS['csrf_token'] ?? ''); ?>">
+                    <input type="hidden" name="_csrf_token" value="<?php echo $GLOBALS['csrf_token'] ?? ''; ?>">
 
                     <!-- Email Field -->
                     <div class="mb-3">

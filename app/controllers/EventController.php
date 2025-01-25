@@ -208,7 +208,10 @@ class EventController
     public function delete(int $eventId): void
     {
         try {
-            $this->deleteEvent->execute($eventId);
+            $user = $this->getAuthUser->execute();
+            $event = $this->getEventDetails->execute($eventId, $user->getId());
+            $this->deleteEvent->execute($event->getId());
+            setFlashMessage('success', "Event deleted successfully");
             header('Location: /events');
         } catch (\Exception $e) {
             echo "Error: " . $e->getMessage();

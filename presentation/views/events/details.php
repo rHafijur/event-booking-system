@@ -47,7 +47,8 @@
                 <!-- <p class="card-text"><strong>Organizer:</strong> John Doe</p> -->
                 <div class="text-end">
                     <a href="/event/<?= htmlspecialchars($event->getId()) ?>/edit" class="btn btn-warning">Edit Event</a>
-                    <form method="POST" action="/event/delete?id=1" class="d-inline">
+                    <form onsubmit="deleteEvent(event)" method="POST" action="/event/<?= $event->getId() ?>/delete" class="d-inline">
+                        <input type="hidden" name="_csrf_token" value="<?php echo $GLOBALS['csrf_token'] ?? ''; ?>">
                         <button type="submit" class="btn btn-danger">Delete Event</button>
                     </form>
                 </div>
@@ -92,5 +93,13 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function deleteEvent(event){
+            event.preventDefault();
+            if(confirm('Are you really want to delete this event along with it\'s attendees')){
+                event.target.submit();
+            }
+        }
+    </script>
 </body>
 </html>

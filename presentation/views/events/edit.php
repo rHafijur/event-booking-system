@@ -31,7 +31,7 @@
         <h1 class="text-center mb-4">Edit Event</h1>
         <form id="eventForm" class="needs-validation" novalidate>
 
-            <input type="hidden" name="_csrf_token" value="<?php echo htmlspecialchars( $GLOBALS['csrf_token'] ?? ''); ?>">
+            <input type="hidden" name="_csrf_token" value="<?php echo $GLOBALS['csrf_token'] ?? ''; ?>">
 
             <div class="row mb-3">
                 <div class="col-md-6">

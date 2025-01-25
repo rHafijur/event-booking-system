@@ -61,6 +61,7 @@ $router = [
     // Event Management
     'GET /events' => function (): void {
         applyMiddleware([AuthenticatedMiddleware::class], function (): void {
+            $GLOBALS['csrf_token'] = CsrfProtection::generateToken();
             $controller = ControllerFactory::getEventController();
             $controller->list();
         });
@@ -80,6 +81,7 @@ $router = [
     },
     'GET /event/{id}' => function (array $params): void {
         applyMiddleware([AuthenticatedMiddleware::class], function () use ($params): void {
+            $GLOBALS['csrf_token'] = CsrfProtection::generateToken();
             $controller = ControllerFactory::getEventController();
             $controller->details($params['id']);
         });
@@ -95,6 +97,12 @@ $router = [
         applyMiddleware([AuthenticatedMiddleware::class, CsrfProtection::class], function () use ($params): void {
             $controller = ControllerFactory::getEventController();
             $controller->update($params['id']);
+        });
+    },
+    'POST /event/{id}/delete' => function (array $params): void {
+        applyMiddleware([AuthenticatedMiddleware::class, CsrfProtection::class], function () use ($params): void {
+            $controller = ControllerFactory::getEventController();
+            $controller->delete($params['id']);
         });
     },
 ];

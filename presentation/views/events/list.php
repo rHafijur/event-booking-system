@@ -81,7 +81,8 @@
                             <td>
                                 <a href="/event/<?= $event->getId() ?>" class="btn btn-sm btn-info">View</a>
                                 <a href="/event/<?= $event->getId() ?>/edit" class="btn btn-sm btn-warning">Edit</a>
-                                <form method="POST" action="/event/delete?id=1" class="d-inline">
+                                <form onsubmit="deleteEvent(event)" method="POST" action="/event/<?= $event->getId() ?>/delete" class="d-inline">
+                                    <input type="hidden" name="_csrf_token" value="<?php echo $GLOBALS['csrf_token'] ?? ''; ?>">
                                     <button type="submit" class="btn btn-sm btn-danger">Delete</button>
                                 </form>
                             </td>
@@ -101,5 +102,13 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function deleteEvent(event){
+            event.preventDefault();
+            if(confirm('Are you really want to delete this event along with it\'s attendees?')){
+                event.target.submit();
+            }
+        }
+    </script>
 </body>
 </html>
