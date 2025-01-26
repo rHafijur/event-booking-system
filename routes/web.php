@@ -105,6 +105,17 @@ $router = [
             $controller->delete($params['id']);
         });
     },
+    'GET /event/{id}/register' => function (array $params): void {
+        $GLOBALS['csrf_token'] = CsrfProtection::generateToken();
+        $controller = ControllerFactory::getAttendeeController();
+        $controller->registerView($params['id']);
+    },
+    'POST /attendee/register' => function (array $params): void {
+        applyMiddleware([CsrfProtection::class], function () use ($params): void {
+            $controller = ControllerFactory::getAttendeeController();
+            $controller->register();
+        });
+    },
 ];
 
 // Process the Request

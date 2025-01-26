@@ -34,7 +34,7 @@ class RegisterAttendee
         }
 
         // Register attendee
-        $attendee = new Attendee( $eventId, $name, $email, $registeredAt);
+        $attendee = new Attendee($name, $email, $eventId, $registeredAt);
         $attendeeId = $this->attendeeRepository->register($attendee);
         $attendee->setId($attendeeId);
 

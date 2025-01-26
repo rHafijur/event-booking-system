@@ -2,6 +2,7 @@
 
 namespace App\Controllers;
 
+use Core\UseCases\Attendee\FindEventAttendeeByEmail;
 use Core\UseCases\Attendee\RegisterAttendee;
 use Core\UseCases\Attendee\ListAttendeesForEvent;
 use Core\UseCases\Event\GetEventDetails;
@@ -11,17 +12,19 @@ class AttendeeController
 {
     private RegisterAttendee $registerAttendee;
     private ListAttendeesForEvent $listAttendeesForEvent;
-
     private GetEventDetails $getEventDetails;
+    private FindEventAttendeeByEmail $findEventAttendeeByEmail;
 
     public function __construct(
         RegisterAttendee $registerAttendee,
         ListAttendeesForEvent $listAttendeesForEvent,
-        GetEventDetails $getEventDetails
+        GetEventDetails $getEventDetails,
+        FindEventAttendeeByEmail $findEventAttendeeByEmail
     ) {
         $this->registerAttendee = $registerAttendee;
         $this->listAttendeesForEvent = $listAttendeesForEvent;
         $this->getEventDetails = $getEventDetails;
+        $this->findEventAttendeeByEmail = $findEventAttendeeByEmail;
     }
 
     public function registerView(int $eventId): void
@@ -36,9 +39,42 @@ class AttendeeController
         $name = $_POST['name'];
         $email = $_POST['email'];
 
+        $errors = [];
+
+        if (empty($name)) {
+            $errors[] = "Event name is required.";
+        } elseif (strlen($name) > 100) {
+            $errors[] = "Event name should not exceed 100 characters.";
+        }
+        
+        if (empty($email)) {
+            $errors[] = "Email is required.";
+        } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            $errors[] = "Given email is invalid.";
+        }
+
+        $existingAttendees = $this->findEventAttendeeByEmail->execute($eventId, $email);
+        
+        if(count($existingAttendees)){
+            $errors[] = "Email is already registered in this event.";
+        }
+
+        $event = $this->getEventDetails->execute($eventId);
+
+
+        if($event->availableTicketCount() < 1){
+            $errors[] = "All tickets are sold out.";
+        }
+
+        if(count($errors)){
+            http_response_code(400);
+            echo json_encode(['errors'=> $errors]);
+            exit;
+        }
+
         try {
-            $this->registerAttendee->execute($eventId, $name, $email, new DateTime());
-            header('Location: /events/' . $eventId . '/attendees');
+            $this->registerAttendee->execute($event->getId(), $name, $email, new DateTime());
+            echo true;
         } catch (\Exception $e) {
             echo "Error: " . $e->getMessage();
         }

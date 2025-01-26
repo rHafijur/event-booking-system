@@ -19,10 +19,10 @@ class MySQLEventRepository implements EventRepository
     public function findById(int $id, ?int $organizerId = null): ?Event
     {
         $params = ['id' => $id];
-        $query = "SELECT * FROM events WHERE id = :id";
+        $query = "SELECT events.*, COUNT(attendees.id) as attendee_count FROM events LEFT JOIN attendees on events.id = attendees.event_id WHERE events.id = :id";
 
         if($organizerId){
-            $query.=" AND organizer_id = :organizer_id";
+            $query.=" AND events.organizer_id = :organizer_id";
             $params['organizer_id'] = $organizerId;
         }
 

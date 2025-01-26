@@ -18,6 +18,7 @@ use App\Controllers\AttendeeController;
 use App\Controllers\DashboardController;
 use Core\Repositories\AttendeeRepository;
 use Core\Repositories\EventRepository;
+use Core\UseCases\Attendee\FindEventAttendeeByEmail;
 use Core\UseCases\Event\DeleteEvent;
 use Core\UseCases\Event\GetEventDetails;
 use Core\UseCases\Event\OrganizerListEvents;
@@ -102,7 +103,8 @@ class ControllerFactory
         $attendeeRepository = static::getAttendeeRepository($conn);
         $registerAttendee = new RegisterAttendee($attendeeRepository, $eventRepository);
         $listAttendeesForEvent = new ListAttendeesForEvent($attendeeRepository);
+        $findEventAttendeeByEmail = new FindEventAttendeeByEmail($attendeeRepository);
         $getEventDetails = new GetEventDetails($eventRepository);
-        return new AttendeeController($registerAttendee, $listAttendeesForEvent, $getEventDetails);
+        return new AttendeeController($registerAttendee, $listAttendeesForEvent, $getEventDetails, $findEventAttendeeByEmail);
     }
 }

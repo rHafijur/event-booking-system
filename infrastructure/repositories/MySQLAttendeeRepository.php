@@ -23,6 +23,18 @@ class MySQLAttendeeRepository implements AttendeeRepository
 
         return array_map([$this, 'mapToEntity'], $rows);
     }
+    
+    public function findByEventIdAndEmail(int $eventId, string $email): array
+    {
+        $stmt = $this->db->prepare("SELECT * FROM attendees WHERE event_id = :event_id AND email = :email");
+        $stmt->execute([
+            'event_id' => $eventId,
+            'email' => $email,
+        ]);
+        $rows = $stmt->fetchAll();
+
+        return array_map([$this, 'mapToEntity'], $rows);
+    }
 
     public function register(Attendee $attendee): int
     {
