@@ -16,6 +16,8 @@ class Event
     private int $organizerId;
     private \DateTime $createdAt;
 
+    private ?int $attendeeCount;
+
     public function __construct(
         string $name,
         string $description,
@@ -52,6 +54,7 @@ class Event
     public function getTicketPrice(): float { return $this->ticketPrice; }
     public function getOrganizerId(): int { return $this->organizerId; }
     public function getCreatedAt(): \DateTime { return $this->createdAt; }
+    public function getAttendeeCount(): ?int { return $this->attendeeCount; }
 
     // Setters
     public function setId(int $id): void { $this->id = $id; }
@@ -65,9 +68,10 @@ class Event
     public function setTicketPrice(float $ticketPrice): void { $this->ticketPrice = $ticketPrice; }
     public function setOrganizerId(int $organizerId): void { $this->organizerId = $organizerId; }
     public function setCreatedAt(\DateTime $createdAt): void { $this->createdAt = $createdAt; }
+    public function setAttendeeCount(int $attendeeCount): void { $this->attendeeCount = $attendeeCount; }
 
     // Utility Methods
-    public function isBookingAllowed(\DateTime $currentDate): bool
+    public function isBookingAllowed(\DateTime $currentDate = new \DateTime()): bool
     {
         return $currentDate <= $this->bookingDeadline;
     }
@@ -75,5 +79,14 @@ class Event
     public function hasPassed(\DateTime $currentDate): bool
     {
         return $currentDate > $this->eventDate;
+    }
+    
+    public function availableTicketCount(): ?int
+    {
+        if($this->attendeeCount){
+            return $this->capacity - $this->attendeeCount;
+        }
+
+        return null;
     }
 }

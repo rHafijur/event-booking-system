@@ -4,6 +4,7 @@ namespace Infrastructure\Repositories;
 
 use Core\Repositories\EventRepository;
 use Core\Entities\Event;
+use DateTime;
 use PDO;
 
 class MySQLEventRepository implements EventRepository
@@ -37,6 +38,15 @@ class MySQLEventRepository implements EventRepository
         $stmt = $this->db->prepare("SELECT * FROM events LIMIT :offset, :limit");
         $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
         $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+        $stmt->execute();
+        $rows = $stmt->fetchAll();
+        return array_map([$this, 'mapToEntity'], $rows);
+    }
+    public function findAllUpcoming(): array
+    {
+        $today = (new DateTime())->format('Y-m-d');
+        $stmt = $this->db->prepare("SELECT events.*, COUNT(attendees.id) as attendee_count FROM events LEFT JOIN attendees on events.id = attendees.event_id WHERE DATE(event_date) >= :today ORDER BY event_date DESC");
+        $stmt->bindValue(':today', $today);
         $stmt->execute();
         $rows = $stmt->fetchAll();
         return array_map([$this, 'mapToEntity'], $rows);
@@ -152,6 +162,9 @@ class MySQLEventRepository implements EventRepository
     {
         $event = new Event($row['name'], $row['description'], $row['capacity'],  new \DateTime($row['event_date']), new \DateTime($row['booking_deadline']), $row['image'], $row['venue'], $row['ticket_price'], $row['organizer_id'], new \DateTime($row['created_at']));
         $event->setId($row['id']);
+        if(isset($row['attendee_count'])){
+            $event->setAttendeeCount($row['attendee_count']);
+        }
         return $event;
     }
 }
