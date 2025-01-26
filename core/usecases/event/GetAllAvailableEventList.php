@@ -4,7 +4,7 @@ namespace Core\UseCases\Event;
 
 use Core\Repositories\EventRepository;
 
-class GetAllUpcomingEventList
+class GetAllAvailableEventList
 {
     private EventRepository $eventRepository;
 
@@ -15,6 +15,6 @@ class GetAllUpcomingEventList
 
     public function execute(): array
     {
-        return $this->eventRepository->findAllUpcoming();
+        return $this->eventRepository->findAllAvailable();
     }
 }

@@ -42,10 +42,10 @@ class MySQLEventRepository implements EventRepository
         $rows = $stmt->fetchAll();
         return array_map([$this, 'mapToEntity'], $rows);
     }
-    public function findAllUpcoming(): array
+    public function findAllAvailable(): array
     {
         $today = (new DateTime())->format('Y-m-d');
-        $stmt = $this->db->prepare("SELECT events.*, COUNT(attendees.id) as attendee_count FROM events LEFT JOIN attendees on events.id = attendees.event_id WHERE DATE(event_date) >= :today ORDER BY event_date DESC");
+        $stmt = $this->db->prepare("SELECT events.*, COUNT(attendees.id) as attendee_count FROM events LEFT JOIN attendees on events.id = attendees.event_id WHERE DATE(booking_deadline) >= :today GROUP BY events.id HAVING attendee_count < events.capacity ORDER BY events.event_date DESC");
         $stmt->bindValue(':today', $today);
         $stmt->execute();
         $rows = $stmt->fetchAll();

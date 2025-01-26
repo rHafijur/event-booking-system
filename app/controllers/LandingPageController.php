@@ -1,25 +1,25 @@
 <?php
 namespace App\Controllers;
 
-use Core\UseCases\Event\GetAllUpcomingEventList;
+use Core\UseCases\Event\GetAllAvailableEventList;
 use Core\Usecases\User\GetAuthUser;
 
 class LandingPageController
 {
     private GetAuthUser $getAuthUser;
-    private GetAllUpcomingEventList $getAllUpcomingEventList;
+    private GetAllAvailableEventList $getAllAvailableEventList;
 
-    public function __construct(GetAuthUser $getAuthUser, GetAllUpcomingEventList $getAllUpcomingEventList)
+    public function __construct(GetAuthUser $getAuthUser, GetAllAvailableEventList $getAllAvailableEventList)
     {
         $this->getAuthUser = $getAuthUser;
-        $this->getAllUpcomingEventList = $getAllUpcomingEventList;
+        $this->getAllAvailableEventList = $getAllAvailableEventList;
     }
 
     public function index()
     {
         $user = $this->getAuthUser->execute();
 
-        $upcomingEvents = $this->getAllUpcomingEventList->execute();
+        $availableEvents = $this->getAllAvailableEventList->execute();
         
         require __DIR__.'/../../presentation/views/landing/index.php';
     }

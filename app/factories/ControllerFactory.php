@@ -6,7 +6,7 @@ use App\Controllers\LandingPageController;
 use Core\UseCases\Attendee\ListAttendeesForEvent;
 use Core\UseCases\Attendee\RegisterAttendee;
 use Core\UseCases\Event\CreateEvent;
-use Core\UseCases\Event\GetAllUpcomingEventList;
+use Core\UseCases\Event\GetAllAvailableEventList;
 use Core\UseCases\Event\ListEvents;
 use Core\Usecases\User\GetAuthUser;
 use Infrastructure\Repositories\MySQLAttendeeRepository;
@@ -56,8 +56,8 @@ class ControllerFactory
         $conn = static::getDbConn();
         $userRepository = static::getUserRepository($conn);
         $getAuthUser = new GetAuthUser($userRepository);
-        $getAllUpcomingEventList = new GetAllUpcomingEventList(static::getEventRepository($conn));
-        return new LandingPageController($getAuthUser, $getAllUpcomingEventList);
+        $getAllAvailableEventList = new GetAllAvailableEventList(static::getEventRepository($conn));
+        return new LandingPageController($getAuthUser, $getAllAvailableEventList);
     }
     
     public static function getDashboardController()

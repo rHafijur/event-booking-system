@@ -10,7 +10,7 @@ interface EventRepository
 
     public function findAll(int $page, int $limit): array;
 
-    public function findAllUpcoming(): array;
+    public function findAllAvailable(): array;
 
     public function findAllByOrganizerId(int $organizerId, int $page, int $limit, ?string $search, ?string $orderby): array;
 
