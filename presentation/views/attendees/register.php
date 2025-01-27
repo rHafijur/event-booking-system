@@ -75,12 +75,65 @@
         </div>
     </div>
 
-    <!-- Toast Container -->
     <div id="toast-container"></div>
 
+    <div class="modal fade" id="ticketModal" tabindex="-1" aria-labelledby="ticketModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="ticketModalLabel">Your Event Ticket</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-center">
+                    <h3 id="ticketEventName"></h3>
+                    <p><strong>Date:</strong> <span id="ticketEventDate"></span></p>
+                    <p><strong>Venue:</strong> <span id="ticketEventVenue"></span></p>
+                    <p><strong>Attendee:</strong> <span id="ticketAttendeeName"></span></p>
+                    <p><strong>Email:</strong> <span id="ticketAttendeeEmail"></span></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" onclick="printTicket()">Print Ticket</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
+
     <script>
-        // Bootstrap validation
+        function showTicketModal(data) {
+            document.getElementById('ticketEventName').innerText = data.eventName;
+            document.getElementById('ticketEventDate').innerText = data.eventDate;
+            document.getElementById('ticketEventVenue').innerText = data.eventVenue;
+            document.getElementById('ticketAttendeeName').innerText = data.attendeeName;
+            document.getElementById('ticketAttendeeEmail').innerText = data.attendeeEmail;
+
+            const ticketModal = new bootstrap.Modal(document.getElementById('ticketModal'));
+            ticketModal.show();
+        }
+
+        function printTicket() {
+            const originalContent = document.body.innerHTML;
+            const ticketContent = document.querySelector('#ticketModal .modal-body').innerHTML;
+
+            // Create a temporary print section
+            const printWindow = window.open('', '_blank', 'width=800,height=600');
+            printWindow.document.write(`
+                <html>
+                    <head>
+                        <title>Event Ticket</title>
+                        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
+                    </head>
+                    <body>${ticketContent}</body>
+                </html>
+            `);
+            printWindow.document.close();
+            printWindow.print();
+            printWindow.close();
+        }
+
+
         (function () {
             'use strict';
             const forms = document.querySelectorAll('.needs-validation');
@@ -94,6 +147,7 @@
                 }, false);
             });
         })();
+        
 
         // AJAX Form Submission
         const form = document.getElementById('event-registration-form');
@@ -112,10 +166,19 @@
             })
             .then(response => {
                 if (response.ok) {
-                    showToast('Registration successful!', 'success');
-                    setTimeout(() => {
-                        window.location.href = '/';
-                    }, 2000);
+                    response.json().then(data => {
+                        showToast('Registration successful!', 'success');
+                        showTicketModal({
+                            eventName: data.event_name,
+                            eventDate: data.event_date,
+                            eventVenue: data.venue,
+                            attendeeName: data.attendee_name,
+                            attendeeEmail: data.email
+                        });
+                    });
+                    // setTimeout(() => {
+                    //     window.location.href = '/';
+                    // }, 2000);
                 } else {
                     response.text().then(value => {
                         let error = JSON.parse(value);

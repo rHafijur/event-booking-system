@@ -74,7 +74,13 @@ class AttendeeController
 
         try {
             $this->registerAttendee->execute($event->getId(), $name, $email, new DateTime());
-            echo true;
+            echo json_encode([
+                'event_name' => $event->getName(),
+                'venue' => $event->getVenue(),
+                'event_date' => $event->getEventDate()->format('d/M/Y'),
+                'attendee_name' => $name,
+                'email' => $email
+            ]);
         } catch (\Exception $e) {
             echo "Error: " . $e->getMessage();
         }
