@@ -52,6 +52,7 @@ class EventController
 
     public function createView(): void
     {
+        $user = $this->getAuthUser->execute();
         require __DIR__."/../../presentation/views/events/create.php";
     }
 
@@ -112,14 +113,10 @@ class EventController
             $errors[] = "Ticket price must be a non-negative number.";
         }
 
-        if(isset($_FILES['image'])){
-            try{
-                $image = uploadImage('storage/images/','image');
-            }catch(\Exception $e){
-                $errors[] = $e->getMessage();
-            }
-        }else{
-            $image = null;
+        try{
+            $image = uploadImage('storage/images/','image');
+        }catch(\Exception $e){
+            $errors[] = $e->getMessage();
         }
 
         if(count($errors)){
@@ -215,14 +212,17 @@ class EventController
             $errors[] = "Ticket price must be a non-negative number.";
         }
 
-        if(isset($_FILES['image'])){
+        $shouldDeleteThePreviousImage = false;
+
+        if(isset($_FILES['image']) && $_FILES['image']['error'] !== UPLOAD_ERR_NO_FILE){
             try{
                 $image = uploadImage('storage/images/','image');
+                $shouldDeleteThePreviousImage = true;
             }catch(\Exception $e){
                 $errors[] = $e->getMessage();
             }
         }else{
-            $image = null;
+            $image = $previousImage;
         }
 
         if(count($errors)){
@@ -234,7 +234,7 @@ class EventController
         try {
             $this->updateEvent->execute($eventId, $name, $description, $capacity, $eventDate, $bookingDeadline, $image, $venue, $ticketPrice);
             
-            if($previousImage){
+            if($shouldDeleteThePreviousImage){
                 try{
                     deleteFile($previousImage);
                 }catch(\Exception $_){}

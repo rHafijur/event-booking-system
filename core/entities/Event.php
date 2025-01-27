@@ -83,7 +83,7 @@ class Event
     
     public function availableTicketCount(): ?int
     {
-        if($this->attendeeCount){
+        if($this->attendeeCount !==null){
             return $this->capacity - $this->attendeeCount;
         }
 

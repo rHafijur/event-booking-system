@@ -57,8 +57,8 @@
 
             <div class="mb-3">
                 <label for="image" class="form-label">Event Image</label>
-                <input type="file" class="form-control" id="image" name="image" accept="image/*">
-                <div class="form-text">Optional: Upload an image for the event.</div>
+                <input type="file" class="form-control" id="image" name="image" accept="image/*" required>
+                <div class="invalid-feedback">Please upload an image for the event.</div>
             </div>
 
 
@@ -66,26 +66,6 @@
                 <button type="submit" class="btn btn-primary">Create Event</button>
             </div>
         </form>
-    </div>
-
-    <!-- Toast Container -->
-    <div class="toast-container position-fixed bottom-0 end-0 p-3">
-        <div id="successToast" class="toast align-items-center text-bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
-            <div class="d-flex">
-                <div class="toast-body">
-                    Event created successfully!
-                </div>
-                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
-            </div>
-        </div>
-        <div id="errorToast" class="toast align-items-center text-bg-danger border-0" role="alert" aria-live="assertive" aria-atomic="true">
-            <div class="d-flex">
-                <div class="toast-body" id="errorText">
-                An error occurred. Please try again later.
-                </div>
-                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
-            </div>
-        </div>
     </div>
 
     <script>
@@ -104,26 +84,21 @@
             })
                 .then(response => {
                     if (response.status === 200) {
-                        const toast = new bootstrap.Toast(document.getElementById('successToast'));
-                        toast.show();
+                        showToast('Event created successfully!', 'success');
                         setTimeout(() => {
-                            window.location.href = '/dashboard';
+                            window.location.href = '/events';
                         }, 2000);
                     } else {
                         response.text().then(value => {
                             let error = JSON.parse(value);
-                            const errorText = error.errors.join('<br>');
-
-                            document.getElementById('errorText').innerHTML =errorText;
-                            const toast = new bootstrap.Toast(document.getElementById('errorToast'));
-                            toast.show();
+                            for(let err of error.errors){
+                                showToast(err, 'danger');
+                            }
                         });
                     }
                 })
                 .catch(() => {
-                    document.getElementById('errorText').innerHTML = "An error occurred. Please try again later.";
-                    const toast = new bootstrap.Toast(document.getElementById('errorToast'));
-                    toast.show();
+                    showToast("An error occurred. Please try again later.", "danger");
                 });
         });
     </script>
