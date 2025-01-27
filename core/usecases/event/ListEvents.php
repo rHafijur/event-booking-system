@@ -13,8 +13,8 @@ class ListEvents
         $this->eventRepository = $eventRepository;
     }
 
-    public function execute(int $page, int $pageSize, ?string $search = null, ?array $filters = []): array
+    public function execute(int $page, int $pageSize, ?string $search, ?string $orderBy): array
     {
-        return $this->eventRepository->findAll($page, $pageSize);
+        return $this->eventRepository->findAll($page, $pageSize, $search, $orderBy);
     }
 }

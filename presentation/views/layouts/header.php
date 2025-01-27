@@ -17,11 +17,20 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="/events">My Events</a>
+                        <a class="nav-link" href="/events">
+                            <?php if(!$user->isAdmin()): ?>
+                                My 
+                            <?php else: ?>
+                                All
+                            <?php endif ?>
+                                Events
+                        </a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/event/create">Create Event</a>
-                    </li>
+                    <?php if(!$user->isAdmin()): ?>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/event/create">Create Event</a>
+                        </li>
+                    <?php endif ?>
                     <li class="nav-item">
                         <a class="nav-link" href="/logout">Logout</a>
                     </li>

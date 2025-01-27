@@ -22,11 +22,14 @@
                 <p class="card-text"><strong>Ticket Price:</strong> $<?= htmlspecialchars($event->getTicketPrice()) ?></p>
                 <!-- <p class="card-text"><strong>Organizer:</strong> John Doe</p> -->
                 <div class="text-end">
-                    <a href="/event/<?= htmlspecialchars($event->getId()) ?>/edit" class="btn btn-warning">Edit Event</a>
-                    <form onsubmit="deleteEvent(event)" method="POST" action="/event/<?= $event->getId() ?>/delete" class="d-inline">
-                        <input type="hidden" name="_csrf_token" value="<?php echo $GLOBALS['csrf_token'] ?? ''; ?>">
-                        <button type="submit" class="btn btn-danger">Delete Event</button>
-                    </form>
+                    <?php if(!$user->isAdmin()): ?>
+                        <a href="/event/<?= htmlspecialchars($event->getId()) ?>/edit" class="btn btn-warning">Edit Event</a>
+                        <form onsubmit="deleteEvent(event)" method="POST" action="/event/<?= $event->getId() ?>/delete" class="d-inline">
+                            <input type="hidden" name="_csrf_token" value="<?php echo $GLOBALS['csrf_token'] ?? ''; ?>">
+                            <button type="submit" class="btn btn-danger">Delete Event</button>
+                        </form>
+                    <?php endif ?>
+                    <a href="/event/<?= $event->getId() ?>/download-attendees-report" class="btn btn-sm btn-info">Download Attendee List</a>
                 </div>
             </div>
         </div>

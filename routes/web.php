@@ -86,6 +86,12 @@ $router = [
             $controller->details($params['id']);
         });
     },
+    'GET /event/{id}/download-attendees-report' => function (array $params): void {
+        applyMiddleware([AuthenticatedMiddleware::class], function () use ($params): void {
+            $controller = ControllerFactory::getEventController();
+            $controller->downloadAttendeesReport($params['id']);
+        });
+    },
     'GET /event/{id}/edit' => function (array $params): void {
         applyMiddleware([AuthenticatedMiddleware::class], function () use ($params): void {
             $GLOBALS['csrf_token'] = CsrfProtection::generateToken();

@@ -32,15 +32,9 @@ class MySQLEventRepository implements EventRepository
         return $row ? $this->mapToEntity($row) : null;
     }
 
-    public function findAll(int $page, int $limit): array
+    public function findAll(int $page, int $limit, ?string $search, ?string $orderBy): array
     {
-        $offset = ($page - 1) * $limit;
-        $stmt = $this->db->prepare("SELECT * FROM events LIMIT :offset, :limit");
-        $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
-        $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
-        $stmt->execute();
-        $rows = $stmt->fetchAll();
-        return array_map([$this, 'mapToEntity'], $rows);
+        return $this->_commonFindAll(null, $page, $limit, $search, $orderBy);
     }
     public function findAllAvailable(): array
     {
@@ -53,19 +47,27 @@ class MySQLEventRepository implements EventRepository
     }
     public function findAllByOrganizerId(int $organizerId, int $page, int $limit, ?string $search, ?string $orderBy): array
     {
+        return $this->_commonFindAll($organizerId, $page, $limit, $search, $orderBy);
+    }
+
+    private function _commonFindAll(?int $organizerId, int $page, int $limit, ?string $search, ?string $orderBy){
         $offset = ($page - 1) * $limit;
 
         $query = "SELECT events.* FROM events ";
 
         $countQuery = "SELECT COUNT(events.id) AS total FROM events ";
 
-        $organizerCondition = "WHERE events.organizer_id = :organizer_id";
+        $organizerCondition = $organizerId? "WHERE events.organizer_id = :organizer_id" : "";
 
         if (!empty($search)) {
-            $searchCondition = "LEFT JOIN attendees on attendees.event_id = events.id $organizerCondition AND (events.name LIKE :search_name OR events.description LIKE :search_description OR events.venue LIKE :search_venue OR attendees.name LIKE :search_attendee_name OR attendees.email LIKE :search_attendee_email)";
+            if($organizerId){
+                $searchCondition = "LEFT JOIN attendees on attendees.event_id = events.id $organizerCondition AND (events.name LIKE :search_name OR events.description LIKE :search_description OR events.venue LIKE :search_venue OR attendees.name LIKE :search_attendee_name OR attendees.email LIKE :search_attendee_email)";
+            }else{
+                $searchCondition = "LEFT JOIN attendees on attendees.event_id = events.id WHERE (events.name LIKE :search_name OR events.description LIKE :search_description OR events.venue LIKE :search_venue OR attendees.name LIKE :search_attendee_name OR attendees.email LIKE :search_attendee_email)";
+            }
             $query .= $searchCondition;
             $countQuery .= $searchCondition;
-        }else{
+        }elseif($organizerId){
             $query .= $organizerCondition;
             $countQuery .= $organizerCondition;
         }
@@ -80,10 +82,13 @@ class MySQLEventRepository implements EventRepository
             }
         }
 
-        $query .= " LIMIT :offset, :limit";
+        $query .= " GROUP BY events.id LIMIT :offset, :limit";
+
 
         $countStmt = $this->db->prepare($countQuery);
-        $countStmt->bindValue(':organizer_id', $organizerId, PDO::PARAM_INT);
+        if($organizerId){
+            $countStmt->bindValue(':organizer_id', $organizerId, PDO::PARAM_INT);
+        }
         if (!empty($search)) {
             $countStmt->bindValue(':search_name', '%' . $search . '%', PDO::PARAM_STR);
             $countStmt->bindValue(':search_description', '%' . $search . '%', PDO::PARAM_STR);
@@ -95,7 +100,9 @@ class MySQLEventRepository implements EventRepository
         $totalRecords = (int)$countStmt->fetchColumn();
 
         $stmt = $this->db->prepare($query);
-        $stmt->bindValue(':organizer_id', $organizerId, PDO::PARAM_INT);
+        if($organizerId){
+            $stmt->bindValue(':organizer_id', $organizerId, PDO::PARAM_INT);
+        }
         if (!empty($search)) {
             $stmt->bindValue(':search_name', '%' . $search . '%', PDO::PARAM_STR);
             $stmt->bindValue(':search_description', '%' . $search . '%', PDO::PARAM_STR);

@@ -6,7 +6,9 @@
     <div class="container my-5">
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h1>Events</h1>
-            <a href="/event/create" class="btn btn-primary">Create New Event</a>
+            <?php if(!$user->isAdmin()): ?>
+                <a href="/event/create" class="btn btn-primary">Create New Event</a>
+            <?php endif ?>
         </div>
 
         <!-- Filter/Search Form -->
@@ -56,11 +58,14 @@
                             <td><?= $event->getCapacity() ?></td>
                             <td>
                                 <a href="/event/<?= $event->getId() ?>" class="btn btn-sm btn-info">View</a>
-                                <a href="/event/<?= $event->getId() ?>/edit" class="btn btn-sm btn-warning">Edit</a>
-                                <form onsubmit="deleteEvent(event)" method="POST" action="/event/<?= $event->getId() ?>/delete" class="d-inline">
-                                    <input type="hidden" name="_csrf_token" value="<?php echo $GLOBALS['csrf_token'] ?? ''; ?>">
-                                    <button type="submit" class="btn btn-sm btn-danger">Delete</button>
-                                </form>
+                                <?php if(!$user->isAdmin()): ?>
+                                    <a href="/event/<?= $event->getId() ?>/edit" class="btn btn-sm btn-warning">Edit</a>
+                                    <form onsubmit="deleteEvent(event)" method="POST" action="/event/<?= $event->getId() ?>/delete" class="d-inline">
+                                        <input type="hidden" name="_csrf_token" value="<?php echo $GLOBALS['csrf_token'] ?? ''; ?>">
+                                        <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                                    </form>
+                                <?php endif ?>
+                                <a href="/event/<?= $event->getId() ?>/download-attendees-report" class="btn btn-sm btn-info">Download Attendee List</a>
                             </td>
                         </tr>
                     <?php endforeach ?>

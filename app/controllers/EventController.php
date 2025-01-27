@@ -8,6 +8,8 @@ use Core\UseCases\Event\UpdateEvent;
 use Core\UseCases\Event\DeleteEvent;
 use Core\UseCases\Event\OrganizerListEvents;
 use Core\UseCases\Event\GetEventDetails;
+use Core\UseCases\Event\ListEvents;
+use Core\UseCases\Report\GenerateEventReport;
 use Core\Usecases\User\GetAuthUser;
 
 class EventController
@@ -16,26 +18,32 @@ class EventController
     private UpdateEvent $updateEvent;
     private DeleteEvent $deleteEvent;
     private OrganizerListEvents $organizerListEvents;
+    private ListEvents $listEvents;
     private GetEventDetails $getEventDetails;
     private ListAttendeesForEvent $listAttendeesForEvent;
     private GetAuthUser $getAuthUser;
+    private GenerateEventReport $generateEventReport;
 
     public function __construct(
         CreateEvent $createEvent,
         UpdateEvent $updateEvent,
         DeleteEvent $deleteEvent,
         OrganizerListEvents $organizerListEvents,
+        ListEvents $listEvents,
         GetEventDetails $getEventDetails,
         ListAttendeesForEvent $listAttendeesForEvent,
-        GetAuthUser $getAuthUser
+        GetAuthUser $getAuthUser,
+        GenerateEventReport $generateEventReport
     ) {
         $this->createEvent = $createEvent;
         $this->updateEvent = $updateEvent;
         $this->deleteEvent = $deleteEvent;
         $this->organizerListEvents = $organizerListEvents;
+        $this->listEvents = $listEvents;
         $this->getEventDetails = $getEventDetails;
         $this->listAttendeesForEvent = $listAttendeesForEvent;
         $this->getAuthUser = $getAuthUser;
+        $this->generateEventReport = $generateEventReport;
     }
 
     public function createView(): void
@@ -256,7 +264,12 @@ class EventController
         $user = $this->getAuthUser->execute();
 
         try {
-            $res = $this->organizerListEvents->execute($user->getId(),$page, $pageSize, $search, $orderBy);
+            if($user->isAdmin()){
+                $res = $this->listEvents->execute($page, $pageSize, $search, $orderBy);
+            }else{
+                $res = $this->organizerListEvents->execute($user->getId(),$page, $pageSize, $search, $orderBy);
+            }
+            
             [$events, $totalRecords, $totalPages, $currentPage] = array_values($res);
             require __DIR__.'/../../presentation/views/events/list.php';
         } catch (\Exception $e) {
@@ -268,9 +281,42 @@ class EventController
     {
         try {
             $user = $this->getAuthUser->execute();
-            $event = $this->getEventDetails->execute($eventId, $user->getId());
+
+            if($user->isAdmin()){
+                $event = $this->getEventDetails->execute($eventId);
+            }else{
+                $event = $this->getEventDetails->execute($eventId, $user->getId());
+            }
             $attendees = $this->listAttendeesForEvent->execute($eventId);
             require __DIR__.'/../../presentation/views/events/details.php';
+        } catch (\Exception $e) {
+            echo "Error: " . $e->getMessage();
+        }
+    }
+
+    public function downloadAttendeesReport(int $eventId): void
+    {
+        try {
+            $user = $this->getAuthUser->execute();
+
+            if($user->isAdmin()){
+                $event = $this->getEventDetails->execute($eventId);
+            }else{
+                $event = $this->getEventDetails->execute($eventId, $user->getId());
+            }
+            $filename = strtolower(str_replace(' ', '_', $event->getName())).(new \DateTime())->format('d_m_Y_H_i_s').".csv";
+            $data = $this->generateEventReport->execute($eventId);
+
+            header('Content-Type: text/csv');
+            header('Content-Disposition: attachment; filename="'.$filename.'"');
+
+            $output = fopen('php://output', 'w');
+
+            foreach ($data as $row) {
+                fputcsv($output, $row);
+            }
+
+            fclose($output);
         } catch (\Exception $e) {
             echo "Error: " . $e->getMessage();
         }

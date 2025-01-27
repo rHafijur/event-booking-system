@@ -23,6 +23,7 @@ use Core\UseCases\Event\DeleteEvent;
 use Core\UseCases\Event\GetEventDetails;
 use Core\UseCases\Event\OrganizerListEvents;
 use Core\UseCases\Event\UpdateEvent;
+use Core\UseCases\Report\GenerateEventReport;
 use Infrastructure\Repositories\MySQLUserRepository;
 use Core\UseCases\User\LoginUser;
 use Core\UseCases\User\LogoutUser;
@@ -87,13 +88,14 @@ class ControllerFactory
         $createEvent = new CreateEvent($eventRepository);
         $updateEvent = new UpdateEvent($eventRepository);
         $deleteEvent = new DeleteEvent($eventRepository);
-        // $listEvents = new ListEvents($eventRepository);
+        $listEvents = new ListEvents($eventRepository);
         $organizerListEvents = new OrganizerListEvents($eventRepository);
         $getEventDetails = new GetEventDetails($eventRepository);
         $listAttendeesForEvent = new ListAttendeesForEvent($attendeeRepository);
+        $generateEventReport = new GenerateEventReport($attendeeRepository);
         $userRepository = static::getUserRepository($conn);
         $getAuthUser = new GetAuthUser($userRepository);
-        return new EventController($createEvent, $updateEvent, $deleteEvent, $organizerListEvents, $getEventDetails, $listAttendeesForEvent, $getAuthUser);
+        return new EventController($createEvent, $updateEvent, $deleteEvent, $organizerListEvents, $listEvents, $getEventDetails, $listAttendeesForEvent, $getAuthUser, $generateEventReport);
     }
 
     public static function getAttendeeController()
