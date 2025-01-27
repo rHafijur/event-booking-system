@@ -124,6 +124,8 @@ $router = [
     },
 ];
 
+require_once __DIR__.'/api.php';
+
 // Process the Request
 $requestMethod = $_SERVER['REQUEST_METHOD'];
 $requestUri = strtok($_SERVER['REQUEST_URI'], '?');

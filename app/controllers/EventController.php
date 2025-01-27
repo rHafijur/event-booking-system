@@ -11,6 +11,7 @@ use Core\UseCases\Event\GetEventDetails;
 use Core\UseCases\Event\ListEvents;
 use Core\UseCases\Report\GenerateEventReport;
 use Core\Usecases\User\GetAuthUser;
+use Core\Usecases\User\GetUserById;
 
 class EventController
 {
@@ -23,6 +24,7 @@ class EventController
     private ListAttendeesForEvent $listAttendeesForEvent;
     private GetAuthUser $getAuthUser;
     private GenerateEventReport $generateEventReport;
+    private GetUserById $getUserById;
 
     public function __construct(
         CreateEvent $createEvent,
@@ -33,7 +35,8 @@ class EventController
         GetEventDetails $getEventDetails,
         ListAttendeesForEvent $listAttendeesForEvent,
         GetAuthUser $getAuthUser,
-        GenerateEventReport $generateEventReport
+        GenerateEventReport $generateEventReport,
+        GetUserById $getUserById
     ) {
         $this->createEvent = $createEvent;
         $this->updateEvent = $updateEvent;
@@ -44,6 +47,7 @@ class EventController
         $this->listAttendeesForEvent = $listAttendeesForEvent;
         $this->getAuthUser = $getAuthUser;
         $this->generateEventReport = $generateEventReport;
+        $this->getUserById = $getUserById;
     }
 
     public function createView(): void
@@ -320,5 +324,73 @@ class EventController
         } catch (\Exception $e) {
             echo "Error: " . $e->getMessage();
         }
+    }
+
+    public function listForApi(): void
+    {
+        $page = $_GET['page'] ?? 1;
+        $pageSize = $_GET['page_size'] ?? 10;
+        $search = $_GET['search'] ?? null;
+        $orderBy = $_GET['order_by']?? null;
+
+        header("Content-type: application/json; charset=utf-8");
+
+        try{
+            $res = $this->listEvents->execute($page, $pageSize, $search, $orderBy);
+            [$events, $totalRecords, $totalPages, $currentPage] = array_values($res);
+
+            $data = [];
+
+            foreach($events as $event){
+                $attendees = $this->listAttendeesForEvent->execute($event->getId());
+                $event->setAttendeeCount(count($attendees));
+                $attendeeData = [];
+                foreach($attendees as $attendee){
+                    $attendeeData[] = [
+                        'id' => $attendee->getId(),
+                        'name' => $attendee->getName(),
+                        'email' => $attendee->getEmail(),
+                    ];
+                }
+
+                $organizer = $this->getUserById->execute($event->getOrganizerId());
+
+                $data[] = [
+                    'id' => $event->getId(),
+                    'name' => $event->getName(),
+                    'description' => $event->getDescription(),
+                    'capacity' => $event->getCapacity(),
+                    'venue' => $event->getVenue(),
+                    'registration_fee' => $event->getTicketPrice(),
+                    'event_date' => $event->getEventDate()->format('d/M/Y'),
+                    'booking_deadline' => $event->getBookingDeadline()->format('d/M/Y'),
+                    'created_at' => $event->getCreatedAt()->format('d/M/Y h:i:s'),
+                    'attendee_count' => $event->getAttendeeCount(),
+                    'organizer' => [
+                        'id' => $organizer->getId(),
+                        'name' => $organizer->getName(),
+                        'email' => $organizer->getEmail(),
+                    ],
+                    'attendees' => $attendeeData
+                ];
+            }
+
+            echo json_encode([
+                'events' => $data,
+                'total_records' => $totalRecords,
+                'total_page' => $totalPages,
+                'current_page' => $currentPage,
+                'status' => true
+            ]);
+
+        }catch(\Exception $e){
+
+            echo json_encode([
+                'error' => $e->getMessage(),
+                'status' => false
+            ]);
+        }
+
+        
     }
 }
