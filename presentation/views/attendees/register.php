@@ -18,7 +18,7 @@
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container">
-            <a class="navbar-brand" href="/">EventManager</a>
+            <a class="navbar-brand" href="<?=url("/")?>">EventManager</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -31,7 +31,7 @@
             <!-- Event Details -->
             <div class="col-md-4">
                 <div class="card">
-                    <img src="/<?= $event->getImage() ?>" height="300" class="card-img-top img-fluid" alt="Event Image">
+                    <img src="<?= asset($event->getImage()) ?>" height="300" class="card-img-top img-fluid" alt="Event Image">
                     <div class="card-body">
                         <h5 class="card-title"><?= htmlspecialchars($event->getName()) ?></h5>
                         <p class="card-text"><strong>Description:</strong> <?= htmlspecialchars($event->getDescription()) ?></p>
@@ -160,7 +160,7 @@
 
             const formData = new FormData(form);
 
-            fetch('/attendee/register', {
+            fetch('<?=url("/attendee/register")?>', {
                 method: 'POST',
                 body: formData,
             })

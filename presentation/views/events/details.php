@@ -7,7 +7,7 @@
     <div class="container my-5">
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h1>Event Details</h1>
-            <a href="/events" class="btn btn-secondary">Back to Events</a>
+            <a href="<?=url("/events")?>" class="btn btn-secondary">Back to Events</a>
         </div>
 
         <!-- Event Information -->
@@ -23,13 +23,13 @@
                 <!-- <p class="card-text"><strong>Organizer:</strong> John Doe</p> -->
                 <div class="text-end">
                     <?php if(!$user->isAdmin()): ?>
-                        <a href="/event/<?= htmlspecialchars($event->getId()) ?>/edit" class="btn btn-warning">Edit Event</a>
-                        <form onsubmit="deleteEvent(event)" method="POST" action="/event/<?= $event->getId() ?>/delete" class="d-inline">
+                        <a href="<?=url("/event/{$event->getId()}/edit")?>" class="btn btn-warning">Edit Event</a>
+                        <form onsubmit="deleteEvent(event)" method="POST" action="<?=url("/event/{$event->getId()}/delete")?>" class="d-inline">
                             <input type="hidden" name="_csrf_token" value="<?php echo $GLOBALS['csrf_token'] ?? ''; ?>">
                             <button type="submit" class="btn btn-danger">Delete Event</button>
                         </form>
                     <?php endif ?>
-                    <a href="/event/<?= $event->getId() ?>/download-attendees-report" class="btn btn-sm btn-info">Download Attendee List</a>
+                    <a href="<?=url("/event/{$event->getId()}/download-attendees-report")?>" class="btn btn-sm btn-info">Download Attendee List</a>
                 </div>
             </div>
         </div>

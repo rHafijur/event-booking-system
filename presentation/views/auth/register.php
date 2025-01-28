@@ -12,7 +12,7 @@
         <div class="card shadow-lg w-100" style="max-width: 400px;">
             <div class="card-body p-4">
                 <h2 class="text-center mb-4">Register</h2>
-                <form action="/register" method="POST">
+                <form action="<?=url("/register")?>" method="POST">
                     <input type="hidden" name="_csrf_token" value="<?php echo htmlspecialchars($GLOBALS['csrf_token'] ?? ''); ?>">
 
                     <!-- Name Field -->
@@ -53,7 +53,7 @@
 
                 <!-- Login Button -->
                 <div class="d-grid">
-                    <a href="/login" class="btn btn-outline-secondary">Login</a>
+                    <a href="<?=url("/login")?>" class="btn btn-outline-secondary">Login</a>
                 </div>
             </div>
         </div>

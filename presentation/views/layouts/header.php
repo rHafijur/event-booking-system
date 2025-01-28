@@ -25,7 +25,7 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="/events">
+                        <a class="nav-link" href="<?=url("/events")?>">
                             <?php if(!$user->isAdmin()): ?>
                                 My 
                             <?php else: ?>
@@ -36,11 +36,11 @@
                     </li>
                     <?php if(!$user->isAdmin()): ?>
                         <li class="nav-item">
-                            <a class="nav-link" href="/event/create">Create Event</a>
+                            <a class="nav-link" href="<?=url("/event/create")?>">Create Event</a>
                         </li>
                     <?php endif ?>
                     <li class="nav-item">
-                        <a class="nav-link" href="/logout">Logout</a>
+                        <a class="nav-link" href="<?=url("/logout")?>">Logout</a>
                     </li>
                 </ul>
             </div>

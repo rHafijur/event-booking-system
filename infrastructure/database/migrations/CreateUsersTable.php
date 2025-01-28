@@ -21,7 +21,7 @@ class CreateUsersTable
             );
         ";
         $db->exec($query);
-        echo "Users table created successfully.\n";
+        echo "Users table created successfully.<br>";
     }
 
     public static function down()
@@ -29,6 +29,6 @@ class CreateUsersTable
         $db = Database::getConnection();
         $query = "DROP TABLE IF EXISTS users;";
         $db->exec($query);
-        echo "Users table dropped successfully.\n";
+        echo "Users table dropped successfully.<br>";
     }
 }

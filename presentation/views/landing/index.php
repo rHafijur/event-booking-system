@@ -18,14 +18,14 @@
                 <ul class="navbar-nav ms-auto">
                     <?php if($user): ?>
                         <li class="nav-item">
-                            <a class="nav-link" href="/dashboard"><?= htmlspecialchars($user->getName()) ?></a>
+                            <a class="nav-link" href="<?=url("/dashboard")?>"><?= htmlspecialchars($user->getName()) ?></a>
                         </li>
                     <?php else: ?>
                         <li class="nav-item">
-                            <a class="nav-link" href="/login">Login</a>
+                            <a class="nav-link" href="<?=url("/login")?>">Login</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="/register">Register</a>
+                            <a class="nav-link" href="<?=url("/register")?>">Register</a>
                         </li>
                     <?php endif; ?>
                 </ul>
@@ -38,7 +38,9 @@
         <div class="container">
             <h1>Welcome to EventManager</h1>
             <p class="lead">Effortlessly manage events and registrations with our simple tool.</p>
-            <a href="/register" class="btn btn-light btn-lg mt-3">Get Started</a>
+            <?php if($user == null): ?>
+                <a href="<?=url("/register")?>" class="btn btn-light btn-lg mt-3">Get Started</a>
+            <?php endif ?>
         </div>
     </header>
 
@@ -49,7 +51,7 @@
              <?php foreach($availableEvents as $event): ?>
                 <div class="col-md-4 mb-4">
                     <div class="card h-100">
-                        <img src="<?= $event->getImage() ?>" height="300px" class="card-img-top" alt="Event Image">
+                        <img src="<?= asset($event->getImage()) ?>" height="300px" class="card-img-top" alt="Event Image">
                         <div class="card-body">
                             <h5 class="card-title"><?= htmlspecialchars($event->getName()) ?></h5>
                             <p class="card-text"><strong>Venue:</strong> <?= htmlspecialchars($event->getVenue()) ?></p>
@@ -59,7 +61,7 @@
                             <?php if($event->availableTicketCount() !== null): ?>
                                 <p class="card-text"><strong>Tickets Available:</strong> <?= $event->availableTicketCount() ?></p>
                             <?php endif ?>
-                            <a href="/event/<?=$event->getId()?>/register" class="btn btn-primary w-100">View Details & Register</a>
+                            <a href="<?=url("/event/{$event->getId()}/register")?>" class="btn btn-primary w-100">View Details & Register</a>
                         </div>
                     </div>
                 </div>

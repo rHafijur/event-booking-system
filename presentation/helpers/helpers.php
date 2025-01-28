@@ -159,4 +159,29 @@ function deleteFile($filePath) {
     return true;
 }
 
+function url($path){
+    return rtrim($_SERVER['SCRIPT_NAME'], '/index.php').$path;
+}
+function asset($path){
+    // Get the current protocol (http or https)
+    $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https://' : 'http://';
+
+
+    // Get the host and port (if any)
+    $host = $_SERVER['HTTP_HOST'];
+
+    // Get the base path of the application
+    $basePath = rtrim($_SERVER['SCRIPT_NAME'], '/index.php');
+    $basePath = rtrim($basePath, '/public');
+
+    // If the application is running on port 8000, adjust the base path
+    if ($host === 'localhost:8000') {
+        $basePath = '';
+        return $protocol . $host . $basePath . '/' . ltrim($path, '/');
+    }
+
+    // Construct the full URL
+    return $protocol . $host . $basePath . '/public/' . ltrim($path, '/');
+}
+
 

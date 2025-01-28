@@ -78,7 +78,7 @@
             }
 
             const formData = new FormData(this);
-            fetch('/event/create', {
+            fetch('<?=url("/event/create")?>', {
                 method: 'POST',
                 body: formData,
             })
@@ -86,8 +86,8 @@
                     if (response.status === 200) {
                         showToast('Event created successfully!', 'success');
                         setTimeout(() => {
-                            window.location.href = '/events';
-                        }, 2000);
+                            window.location.href = '<?=url("/events")?>';
+                        }, 3000);
                     } else {
                         response.text().then(value => {
                             let error = JSON.parse(value);

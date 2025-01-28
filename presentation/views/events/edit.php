@@ -78,7 +78,7 @@
             }
 
             const formData = new FormData(this);
-            fetch('/event/<?= $event->getId() ?>/update', {
+            fetch('<?=url("/event/{$event->getId()}/update")?>', {
                 method: 'POST',
                 body: formData,
             })
@@ -86,7 +86,7 @@
                     if (response.status === 200) {
                         showToast('Event updated successfully!', 'success');
                         setTimeout(() => {
-                            window.location.href = '/events';
+                            window.location.href = '<?=url("/events")?>';
                         }, 2000);
                     } else {
                         response.text().then(value => {

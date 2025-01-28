@@ -28,7 +28,7 @@ class CreateEventsTable
             );
         ";
         $db->exec($query);
-        echo "Events table created successfully.\n";
+        echo "Events table created successfully.<br>";
     }
 
     public static function down()
@@ -36,6 +36,6 @@ class CreateEventsTable
         $db = Database::getConnection();
         $query = "DROP TABLE IF EXISTS events;";
         $db->exec($query);
-        echo "Events table dropped successfully.\n";
+        echo "Events table dropped successfully.<br>";
     }
 }

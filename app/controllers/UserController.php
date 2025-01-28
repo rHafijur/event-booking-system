@@ -52,17 +52,20 @@ class UserController
             }
             setOld('name', $name);
             setOld('email', $email);
-            header('Location: /register');
+            $location = url('/register');
+            header("Location: $location");
             exit;
         }
 
         try {
             $this->registerUser->execute($name, $email, $password);
             setFlashMessage('success','Registration successfull');
-            header('Location: /login');
+            $location = url('/login');
+            header("Location: $location");
         } catch (\Exception $e) {
             setFlashMessage('danger', $e->getMessage());
-            header('Location: /register');
+            $location = url('/register');
+            header("Location: $location");
         }
     }
 
@@ -78,17 +81,20 @@ class UserController
 
         try {
             $result = $this->loginUser->execute($email, $password);
-            header('Location: /dashboard');
+            $location = url('/dashboard');
+            header("Location: $location");
         } catch (\Exception $e) {
             setOld('email',$email);
             setFlashMessage('danger', $e->getMessage());
-            header('Location: /login');
+            $location = url('/login');
+            header("Location: $location");
         }
     }
 
     public function logout(): void
     {
         $this->logoutUser->execute();
-        header('Location: /login');
+        $location = url('/login');
+        header("Location: $location");
     }
 }

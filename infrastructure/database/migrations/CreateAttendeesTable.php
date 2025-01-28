@@ -22,7 +22,7 @@ class CreateAttendeesTable
             );
         ";
         $db->exec($query);
-        echo "Attendees table created successfully.\n";
+        echo "Attendees table created successfully.<br>";
     }
 
     public static function down()
@@ -30,6 +30,6 @@ class CreateAttendeesTable
         $db = Database::getConnection();
         $query = "DROP TABLE IF EXISTS attendees;";
         $db->exec($query);
-        echo "Attendees table dropped successfully.\n";
+        echo "Attendees table dropped successfully.<br>";
     }
 }

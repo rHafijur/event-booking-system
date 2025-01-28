@@ -4,6 +4,7 @@ use App\Factories\ControllerFactory;
 use App\Middlewares\AuthenticatedMiddleware;
 use App\Middlewares\AdminMiddleware;
 use App\Middlewares\CsrfProtection;
+use Infrastructure\Database\Migrations\CreateUsersTable, Infrastructure\Database\Migrations\CreateEventsTable, Infrastructure\Database\Migrations\CreateAttendeesTable;
 
 function applyMiddleware(array $middlewares, callable $callback)
 {
@@ -17,6 +18,12 @@ function applyMiddleware(array $middlewares, callable $callback)
 
 // Routes
 $router = [
+    // This route is to run the db migration, GUID for simple security 😇
+    'GET /migrate/3e5b4559-508f-4daa-b790-928740657bd7' => function (): void {
+        CreateUsersTable::up();
+        CreateEventsTable::up();
+        CreateAttendeesTable::up();
+    },
     'GET /' => function (): void {
         $controller = ControllerFactory::getLandingPageController();
         $controller->index();
@@ -129,6 +136,10 @@ require_once __DIR__.'/api.php';
 // Process the Request
 $requestMethod = $_SERVER['REQUEST_METHOD'];
 $requestUri = strtok($_SERVER['REQUEST_URI'], '?');
+// echo '<pre>';
+// var_dump($_SERVER);
+// echo '</pre>';
+// exit;
 
 // Match the Route with Parameters
 function matchRoute(string $method, string $uri, array $routes)
@@ -139,6 +150,8 @@ function matchRoute(string $method, string $uri, array $routes)
         if ($method !== $routeMethod) {
             continue;
         }
+
+        $routePattern = url($routePattern);
 
         // Convert route patterns to regex
         $pattern = preg_replace('#\{(\w+)\}#', '(?P<$1>[^/]+)', $routePattern);

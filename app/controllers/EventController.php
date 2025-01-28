@@ -129,8 +129,9 @@ class EventController
 
         try {
             $this->createEvent->execute($name, $description, $capacity, $eventDate, $bookingDeadline, $image, $venue, $ticketPrice, $user->getId(), $createdAt);
-            header('Location: /events');
+            echo 'okay';
         } catch (\Exception $e) {
+            http_response_code(500);
             echo "Error: " . $e->getMessage();
         }
     }
@@ -239,8 +240,9 @@ class EventController
                     deleteFile($previousImage);
                 }catch(\Exception $_){}
             }
-            header('Location: /events');
+            echo 'okay';
         } catch (\Exception $e) {
+            http_response_code(500);
             echo "Error: " . $e->getMessage();
         }
     }
@@ -252,7 +254,8 @@ class EventController
             $event = $this->getEventDetails->execute($eventId, $user->getId());
             $this->deleteEvent->execute($event->getId());
             setFlashMessage('success', "Event deleted successfully");
-            header('Location: /events');
+            $location = url('/events');
+            header("Location: $location");
         } catch (\Exception $e) {
             echo "Error: " . $e->getMessage();
         }
