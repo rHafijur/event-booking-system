@@ -97,4 +97,8 @@ class UserController
         $location = url('/login');
         header("Location: $location");
     }
+
+    public function seedAdmin()
+    {
+    }
 }

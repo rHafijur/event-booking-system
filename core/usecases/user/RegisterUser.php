@@ -14,11 +14,11 @@ class RegisterUser
         $this->userRepository = $userRepository;
     }
 
-    public function execute(string $name, string $email, string $password): User
+    public function execute(string $name, string $email, string $password, string $role = 'user'): User
     {
         $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
 
-        $user = new User($name, $email, $hashedPassword, 'user');
+        $user = new User($name, $email, $hashedPassword, $role);
 
         // Save user in repository
         $userId = $this->userRepository->create($user);

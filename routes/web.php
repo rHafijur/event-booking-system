@@ -1,6 +1,7 @@
 <?php
 
 use App\Factories\ControllerFactory;
+use App\Factories\SeederFactory;
 use App\Middlewares\AuthenticatedMiddleware;
 use App\Middlewares\AdminMiddleware;
 use App\Middlewares\CsrfProtection;
@@ -23,6 +24,10 @@ $router = [
         CreateUsersTable::up();
         CreateEventsTable::up();
         CreateAttendeesTable::up();
+    },
+    // This route is to seed the users, GUID for simple security 😇
+    'GET /dbseed/3e5b4559-508f-4daa-b790-928740657bd7' => function (): void {
+        SeederFactory::getUserSeeder()->run();
     },
     'GET /' => function (): void {
         $controller = ControllerFactory::getLandingPageController();
