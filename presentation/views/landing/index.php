@@ -44,30 +44,33 @@
         </div>
     </header>
 
-    <section class="my-5">
-    <div class="container">
-        <h1 class="text-center mb-4">Available Events</h1>
-        <div class="row">
-             <?php foreach($availableEvents as $event): ?>
-                <div class="col-md-4 mb-4">
-                    <div class="card h-100">
-                        <img src="<?= asset($event->getImage()) ?>" height="300px" class="card-img-top" alt="Event Image">
-                        <div class="card-body">
-                            <h5 class="card-title"><?= htmlspecialchars($event->getName()) ?></h5>
-                            <p class="card-text"><strong>Venue:</strong> <?= htmlspecialchars($event->getVenue()) ?></p>
-                            <p class="card-text"><strong>Date:</strong> <?= htmlspecialchars($event->getEventDate()->format('d/M/Y')) ?></p>
-                            <p class="card-text"><strong>Deadline for booking:</strong> <?= htmlspecialchars($event->getBookingDeadline()->format('d/M/Y')) ?></p>
-                            <p class="card-text"><strong>Registration Fee:</strong> $<?= $event->getTicketPrice() ?></p>
-                            <?php if($event->availableTicketCount() !== null): ?>
-                                <p class="card-text"><strong>Tickets Available:</strong> <?= $event->availableTicketCount() ?></p>
-                            <?php endif ?>
-                            <a href="<?=url("/event/{$event->getId()}/register")?>" class="btn btn-primary w-100">View Details & Register</a>
+    <?php if(count($availableEvents)): ?>
+        <section class="my-5">
+            <div class="container">
+                <h1 class="text-center mb-4">Available Events</h1>
+                <div class="row">
+                    <?php foreach($availableEvents as $event): ?>
+                        <div class="col-md-4 mb-4">
+                            <div class="card h-100">
+                                <img src="<?= asset($event->getImage()) ?>" height="300px" class="card-img-top" alt="Event Image">
+                                <div class="card-body">
+                                    <h5 class="card-title"><?= htmlspecialchars($event->getName()) ?></h5>
+                                    <p class="card-text"><strong>Venue:</strong> <?= htmlspecialchars($event->getVenue()) ?></p>
+                                    <p class="card-text"><strong>Date:</strong> <?= htmlspecialchars($event->getEventDate()->format('d/M/Y')) ?></p>
+                                    <p class="card-text"><strong>Deadline for booking:</strong> <?= htmlspecialchars($event->getBookingDeadline()->format('d/M/Y')) ?></p>
+                                    <p class="card-text"><strong>Registration Fee:</strong> $<?= $event->getTicketPrice() ?></p>
+                                    <?php if($event->availableTicketCount() !== null): ?>
+                                        <p class="card-text"><strong>Tickets Available:</strong> <?= $event->availableTicketCount() ?></p>
+                                    <?php endif ?>
+                                    <a href="<?=url("/event/{$event->getId()}/register")?>" class="btn btn-primary w-100">View Details & Register</a>
+                                </div>
+                            </div>
                         </div>
-                    </div>
+                    <?php endforeach ?>
                 </div>
-            <?php endforeach ?>
-        </div>
-    </section>
+            </div>
+        </section>
+    <?php endif ?>
 
     <!-- Features Section -->
     <section class="py-5">
