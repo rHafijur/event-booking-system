@@ -16,8 +16,8 @@ class Database
                 Env::load(__DIR__ . '/../../.env');
 
                 $host = $_ENV['DB_HOST'] ?? 'localhost';
-                $db = $_ENV['DB_NAME'] ?? 'test';
-                $user = $_ENV['DB_USERNAME'] ?? 'root';
+                $db = $_ENV['DB_NAME'];
+                $user = $_ENV['DB_USER'];
                 $pass = $_ENV['DB_PASSWORD'] ?? '';
                 $charset = $_ENV['DB_CHARSET'] ?? 'utf8mb4';
 

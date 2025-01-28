@@ -24,7 +24,7 @@
             "Infrastructure\\Config\\": "infrastructure/config/",
             "Infrastructure\\Database\\": "infrastructure/database/",
             "Infrastructure\\Database\\Migrations\\": "infrastructure/database/migrations/",
-            "Infrastructure\\Database\\Seeder\\": "infrastructure/database/seeder/",
+            "Infrastructure\\Database\\Seeders\\": "infrastructure/database/seeders/",
             "Infrastructure\\Repositories\\": "infrastructure/repositories/"
 
         }
