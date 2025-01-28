@@ -2,9 +2,9 @@
 
 namespace App\Controllers;
 
-use Core\UseCases\User\RegisterUser;
-use Core\UseCases\User\LoginUser;
-use Core\UseCases\User\LogoutUser;
+use Core\Usecases\User\RegisterUser;
+use Core\Usecases\User\LoginUser;
+use Core\Usecases\User\LogoutUser;
 
 class UserController
 {

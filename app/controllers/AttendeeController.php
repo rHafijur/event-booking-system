@@ -2,10 +2,10 @@
 
 namespace App\Controllers;
 
-use Core\UseCases\Attendee\FindEventAttendeeByEmail;
-use Core\UseCases\Attendee\RegisterAttendee;
-use Core\UseCases\Attendee\ListAttendeesForEvent;
-use Core\UseCases\Event\GetEventDetails;
+use Core\Usecases\Attendee\FindEventAttendeeByEmail;
+use Core\Usecases\Attendee\RegisterAttendee;
+use Core\Usecases\Attendee\ListAttendeesForEvent;
+use Core\Usecases\Event\GetEventDetails;
 use DateTime;
 
 class AttendeeController

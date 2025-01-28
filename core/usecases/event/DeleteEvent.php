@@ -1,6 +1,6 @@
 <?php
 
-namespace Core\UseCases\Event;
+namespace Core\Usecases\Event;
 
 use Core\Repositories\EventRepository;
 use Exception;

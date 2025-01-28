@@ -3,11 +3,11 @@
 namespace App\Factories;
 
 use App\Controllers\LandingPageController;
-use Core\UseCases\Attendee\ListAttendeesForEvent;
-use Core\UseCases\Attendee\RegisterAttendee;
-use Core\UseCases\Event\CreateEvent;
-use Core\UseCases\Event\GetAllAvailableEventList;
-use Core\UseCases\Event\ListEvents;
+use Core\Usecases\Attendee\ListAttendeesForEvent;
+use Core\Usecases\Attendee\RegisterAttendee;
+use Core\Usecases\Event\CreateEvent;
+use Core\Usecases\Event\GetAllAvailableEventList;
+use Core\Usecases\Event\ListEvents;
 use Core\Usecases\User\GetAuthUser;
 use Infrastructure\Repositories\MySQLAttendeeRepository;
 use PDO;
@@ -18,17 +18,17 @@ use App\Controllers\AttendeeController;
 use App\Controllers\DashboardController;
 use Core\Repositories\AttendeeRepository;
 use Core\Repositories\EventRepository;
-use Core\UseCases\Attendee\FindEventAttendeeByEmail;
-use Core\UseCases\Event\DeleteEvent;
-use Core\UseCases\Event\GetEventDetails;
-use Core\UseCases\Event\OrganizerListEvents;
-use Core\UseCases\Event\UpdateEvent;
-use Core\UseCases\Report\GenerateEventReport;
+use Core\Usecases\Attendee\FindEventAttendeeByEmail;
+use Core\Usecases\Event\DeleteEvent;
+use Core\Usecases\Event\GetEventDetails;
+use Core\Usecases\Event\OrganizerListEvents;
+use Core\Usecases\Event\UpdateEvent;
+use Core\Usecases\Report\GenerateEventReport;
 use Core\Usecases\User\GetUserById;
 use Infrastructure\Repositories\MySQLUserRepository;
-use Core\UseCases\User\LoginUser;
-use Core\UseCases\User\LogoutUser;
-use Core\UseCases\User\RegisterUser;
+use Core\Usecases\User\LoginUser;
+use Core\Usecases\User\LogoutUser;
+use Core\Usecases\User\RegisterUser;
 use Infrastructure\Repositories\MySQLEventRepository;
 
 class ControllerFactory

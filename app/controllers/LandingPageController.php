@@ -1,7 +1,7 @@
 <?php
 namespace App\Controllers;
 
-use Core\UseCases\Event\GetAllAvailableEventList;
+use Core\Usecases\Event\GetAllAvailableEventList;
 use Core\Usecases\User\GetAuthUser;
 
 class LandingPageController

@@ -1,6 +1,6 @@
 <?php
 
-namespace Core\UseCases\Attendee;
+namespace Core\Usecases\Attendee;
 
 use Core\Repositories\AttendeeRepository;
 

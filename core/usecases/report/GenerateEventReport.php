@@ -1,6 +1,6 @@
 <?php
 
-namespace Core\UseCases\Report;
+namespace Core\Usecases\Report;
 
 use Core\Repositories\AttendeeRepository;
 use Core\Repositories\EventRepository;
