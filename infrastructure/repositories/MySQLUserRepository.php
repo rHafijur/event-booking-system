@@ -33,11 +33,12 @@ class MySQLUserRepository implements UserRepository
 
     public function create(User $user): int
     {
-        $stmt = $this->db->prepare("INSERT INTO users (name, email, password) VALUES (:name, :email, :password)");
+        $stmt = $this->db->prepare("INSERT INTO users (name, email, password, role) VALUES (:name, :email, :password, :role)");
         $stmt->execute([
             'name' => $user->getName(),
             'email' => $user->getEmail(),
-            'password' => $user->getPassword()
+            'password' => $user->getPassword(),
+            'role' => $user->getRole()
         ]);
         return (int)$this->db->lastInsertId();
     }
