@@ -15,11 +15,6 @@ class GetAuthUser
 
     public function execute(): ?User
     {
-        if (session_status() === PHP_SESSION_NONE) {
-            session_start();
-        }
-        // echo $_SESSION['user_id'];
-        // die();
 
         if($userId = $_SESSION['user_id']?? null){
             return $this->userRepository->findById($userId);
