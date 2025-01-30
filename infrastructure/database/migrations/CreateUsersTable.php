@@ -6,7 +6,7 @@ use Infrastructure\Database\Database;
 
 class CreateUsersTable
 {
-    public static function up()
+    public static function up(): void
     {
         $db = Database::getConnection();
         $query = "
@@ -24,7 +24,7 @@ class CreateUsersTable
         echo "Users table created successfully.<br>";
     }
 
-    public static function down()
+    public static function down(): void
     {
         $db = Database::getConnection();
         $query = "DROP TABLE IF EXISTS users;";

@@ -50,7 +50,8 @@ class MySQLEventRepository implements EventRepository
         return $this->_commonFindAll($organizerId, $page, $limit, $search, $orderBy);
     }
 
-    private function _commonFindAll(?int $organizerId, int $page, int $limit, ?string $search, ?string $orderBy){
+    private function _commonFindAll(?int $organizerId, int $page, int $limit, ?string $search, ?string $orderBy): array
+    {
         $offset = ($page - 1) * $limit;
 
         $query = "SELECT events.* FROM events ";

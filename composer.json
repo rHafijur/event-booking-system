@@ -1,5 +1,5 @@
 {
-    "name": "hafijur/event_booking_system",
+    "name": "rafijur/event_booking_system",
     "type": "project",
     "authors": [
         {
@@ -7,11 +7,11 @@
             "email": "bmsakib09.hr@gmail.com"
         }
     ],
-    "require": {},
+    "require": {
+        "php": ">=8.1"
+    },
     "autoload": {
-
         "psr-4": {
-
             "Core\\Entities\\": "core/entities/",
             "Core\\Repositories\\": "core/repositories/",
             "Core\\Usecases\\Attendee\\": "core/usecases/attendee/",
@@ -26,7 +26,6 @@
             "Infrastructure\\Database\\Migrations\\": "infrastructure/database/migrations/",
             "Infrastructure\\Database\\Seeders\\": "infrastructure/database/seeders/",
             "Infrastructure\\Repositories\\": "infrastructure/repositories/"
-
         }
 
     }

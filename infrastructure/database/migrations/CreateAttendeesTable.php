@@ -8,7 +8,7 @@ use Infrastructure\Database\Database;
 
 class CreateAttendeesTable
 {
-    public static function up()
+    public static function up(): void
     {
         $db = Database::getConnection();
         $query = "
@@ -25,7 +25,7 @@ class CreateAttendeesTable
         echo "Attendees table created successfully.<br>";
     }
 
-    public static function down()
+    public static function down(): void
     {
         $db = Database::getConnection();
         $query = "DROP TABLE IF EXISTS attendees;";
