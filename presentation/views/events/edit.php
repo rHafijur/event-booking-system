@@ -49,7 +49,7 @@
                 </div>
                 <div class="col-md-6">
                     <label for="booking_deadline" class="form-label">Booking Deadline</label>
-                    <input type="date" class="form-control" value="<?= $event->getBookingDeadline()->format('Y-m-d') ?>" id="booking_deadline" name="booking_deadline" required>
+                    <input type="datetime-local" class="localtime-input form-control" data-datetime="<?= $event->getBookingDeadline()->format(DateTime::ATOM) ?>" id="booking_deadline" name="booking_deadline" required>
                     <div class="invalid-feedback">Please specify a booking deadline.</div>
                 </div>
             </div>
@@ -78,6 +78,9 @@
             }
 
             const formData = new FormData(this);
+
+            formData.set('booking_deadline', localTimeToUTC(formData.get('booking_deadline')));
+
             fetch('<?=url("/event/{$event->getId()}/update")?>', {
                 method: 'POST',
                 body: formData,

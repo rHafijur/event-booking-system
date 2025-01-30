@@ -63,6 +63,8 @@ class UserController
             $location = url('/login');
             header("Location: $location");
         } catch (\Exception $e) {
+            setOld('name', $name);
+            setOld('email', $email);
             setFlashMessage('danger', $e->getMessage());
             $location = url('/register');
             header("Location: $location");

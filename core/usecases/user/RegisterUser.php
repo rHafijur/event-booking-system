@@ -4,6 +4,7 @@ namespace Core\Usecases\User;
 
 use Core\Repositories\UserRepository;
 use Core\Entities\User;
+use Exception;
 
 class RegisterUser
 {
@@ -16,6 +17,10 @@ class RegisterUser
 
     public function execute(string $name, string $email, string $password, string $role = 'user'): User
     {
+        if($this->userRepository->findByEmail($email)){
+            throw new Exception("$email is already registered.");
+        }
+        
         $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
 
         $user = new User($name, $email, $hashedPassword, $role);

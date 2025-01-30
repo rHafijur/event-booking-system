@@ -19,7 +19,7 @@ class MySQLEventRepository implements EventRepository
     public function findById(int $id, ?int $organizerId = null): ?Event
     {
         $params = ['id' => $id];
-        $query = "SELECT events.*, COUNT(attendees.id) as attendee_count FROM events LEFT JOIN attendees on events.id = attendees.event_id WHERE events.id = :id";
+        $query = "SELECT events.*, COUNT(attendees.id) as attendee_count FROM events LEFT JOIN attendees on events.id = attendees.event_id GROUP BY events.id HAVING events.id = :id";
 
         if($organizerId){
             $query.=" AND events.organizer_id = :organizer_id";
@@ -38,9 +38,9 @@ class MySQLEventRepository implements EventRepository
     }
     public function findAllAvailable(): array
     {
-        $today = (new DateTime())->format('Y-m-d');
-        $stmt = $this->db->prepare("SELECT events.*, COUNT(attendees.id) as attendee_count FROM events LEFT JOIN attendees on events.id = attendees.event_id WHERE DATE(booking_deadline) >= :today GROUP BY events.id HAVING attendee_count < events.capacity ORDER BY events.event_date DESC");
-        $stmt->bindValue(':today', $today);
+        $now = (new DateTime())->format('Y-m-d H:i:s');
+        $stmt = $this->db->prepare("SELECT events.*, COUNT(attendees.id) as attendee_count FROM events LEFT JOIN attendees on events.id = attendees.event_id WHERE booking_deadline >= :now GROUP BY events.id HAVING attendee_count < events.capacity ORDER BY events.event_date DESC");
+        $stmt->bindValue(':now', $now, PDO::PARAM_STR);
         $stmt->execute();
         $rows = $stmt->fetchAll();
         return array_map([$this, 'mapToEntity'], $rows);
@@ -167,7 +167,7 @@ class MySQLEventRepository implements EventRepository
 
     private function mapToEntity(array $row): Event
     {
-        $event = new Event($row['name'], $row['description'], $row['capacity'],  new \DateTime($row['event_date']), new \DateTime($row['booking_deadline']), $row['image'], $row['venue'], $row['ticket_price'], $row['organizer_id'], new \DateTime($row['created_at']));
+        $event = new Event($row['name'], $row['description'], $row['capacity'],  new DateTime($row['event_date']), new DateTime($row['booking_deadline']), $row['image'], $row['venue'], $row['ticket_price'], $row['organizer_id'], new \DateTime($row['created_at']));
         $event->setId($row['id']);
         if(isset($row['attendee_count'])){
             $event->setAttendeeCount($row['attendee_count']);

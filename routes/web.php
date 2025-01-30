@@ -36,7 +36,6 @@ $router = [
     // User Authentication
     'GET /login' => function (): void {
         $controller = ControllerFactory::getUserController();
-        $GLOBALS['csrf_token'] = CsrfProtection::generateToken();
         $controller->loginView();
     },
     'POST /login' => function (): void {
@@ -53,7 +52,6 @@ $router = [
     },
     'GET /register' => function (): void {
         $controller = ControllerFactory::getUserController();
-        $GLOBALS['csrf_token'] = CsrfProtection::generateToken();
         $controller->registerView();
     },
     'POST /register' => function (): void {
@@ -73,14 +71,12 @@ $router = [
     // Event Management
     'GET /events' => function (): void {
         applyMiddleware([AuthenticatedMiddleware::class], function (): void {
-            $GLOBALS['csrf_token'] = CsrfProtection::generateToken();
             $controller = ControllerFactory::getEventController();
             $controller->list();
         });
     },
     'GET /event/create' => function (): void {
         applyMiddleware([AuthenticatedMiddleware::class], function (): void {
-            $GLOBALS['csrf_token'] = CsrfProtection::generateToken();
             $controller = ControllerFactory::getEventController();
             $controller->createView();
         });
@@ -93,7 +89,6 @@ $router = [
     },
     'GET /event/{id}' => function (array $params): void {
         applyMiddleware([AuthenticatedMiddleware::class], function () use ($params): void {
-            $GLOBALS['csrf_token'] = CsrfProtection::generateToken();
             $controller = ControllerFactory::getEventController();
             $controller->details($params['id']);
         });
@@ -106,7 +101,6 @@ $router = [
     },
     'GET /event/{id}/edit' => function (array $params): void {
         applyMiddleware([AuthenticatedMiddleware::class], function () use ($params): void {
-            $GLOBALS['csrf_token'] = CsrfProtection::generateToken();
             $controller = ControllerFactory::getEventController();
             $controller->edit($params['id']);
         });
@@ -124,7 +118,6 @@ $router = [
         });
     },
     'GET /event/{id}/register' => function (array $params): void {
-        $GLOBALS['csrf_token'] = CsrfProtection::generateToken();
         $controller = ControllerFactory::getAttendeeController();
         $controller->registerView($params['id']);
     },
@@ -141,10 +134,10 @@ require_once __DIR__.'/api.php';
 // Process the Request
 $requestMethod = $_SERVER['REQUEST_METHOD'];
 $requestUri = strtok($_SERVER['REQUEST_URI'], '?');
-// echo '<pre>';
-// var_dump($_SERVER);
-// echo '</pre>';
-// exit;
+
+if($requestMethod == 'GET'){
+    $GLOBALS['csrf_token'] = CsrfProtection::generateToken();
+}
 
 // Match the Route with Parameters
 function matchRoute(string $method, string $uri, array $routes)

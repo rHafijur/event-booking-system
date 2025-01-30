@@ -50,7 +50,7 @@
                 </div>
                 <div class="col-md-6">
                     <label for="booking_deadline" class="form-label">Booking Deadline</label>
-                    <input type="date" class="form-control" id="booking_deadline" name="booking_deadline" required>
+                    <input type="datetime-local" class="form-control" id="booking_deadline" name="booking_deadline" required>
                     <div class="invalid-feedback">Please specify a booking deadline.</div>
                 </div>
             </div>
@@ -78,6 +78,9 @@
             }
 
             const formData = new FormData(this);
+            
+            formData.set('booking_deadline', localTimeToUTC(formData.get('booking_deadline')));
+
             fetch('<?=url("/event/create")?>', {
                 method: 'POST',
                 body: formData,

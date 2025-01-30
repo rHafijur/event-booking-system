@@ -29,7 +29,16 @@ class AttendeeController
 
     public function registerView(int $eventId): void
     {
-        $event = $this->getEventDetails->execute($eventId);
+        try{
+            $event = $this->getEventDetails->execute($eventId);
+            if($event->getBookingDeadline()->getTimestamp()< (new DateTime())->getTimestamp()){
+                throw new \Exception("Booking Deadline Expired");
+            }
+        }catch(\Exception $e){
+            echo "Message: ".$e->getMessage();
+            exit;
+        }
+
         require __DIR__."/../../presentation/views/attendees/register.php";
     }
 
@@ -64,6 +73,10 @@ class AttendeeController
 
         if($event->availableTicketCount() < 1){
             $errors[] = "All tickets are sold out.";
+        }
+
+        if($event->getBookingDeadline()->getTimestamp()< (new DateTime())->getTimestamp()){
+            $errors[] = "Booking Deadline Expired";
         }
 
         if(count($errors)){

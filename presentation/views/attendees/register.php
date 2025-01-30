@@ -36,8 +36,8 @@
                         <h5 class="card-title"><?= htmlspecialchars($event->getName()) ?></h5>
                         <p class="card-text"><strong>Description:</strong> <?= htmlspecialchars($event->getDescription()) ?></p>
                         <p class="card-text"><strong>Venue:</strong> <?= htmlspecialchars($event->getVenue()) ?></p>
-                        <p class="card-text"><strong>Date:</strong> <?= htmlspecialchars($event->getEventDate()->format('d/M/Y')) ?></p>
-                        <p class="card-text"><strong>Deadline for booking:</strong> <?= htmlspecialchars($event->getBookingDeadline()->format('d/M/Y')) ?></p>
+                        <p class="card-text"><strong>Date:</strong> <?= $event->getEventDate()->format('d/M/Y') ?></p>
+                        <p class="card-text"><strong>Deadline for booking:</strong> <span class="localtime"><?= $event->getBookingDeadline()->format(\DateTime::ATOM) ?></span></p>
                         <p class="card-text"><strong>Registration Fee:</strong> $<?= $event->getTicketPrice() ?></p>
                         <p class="card-text"><strong>Available Tickets:</strong> <?= $event->availableTicketCount() ?></p>
                     </div>
@@ -211,6 +211,28 @@
             toastContainer.appendChild(toast);
             setTimeout(() => toast.remove(), 3000);
         }
+
+        function convertUTCToLocal(date) {
+            const day = String(date.getDate()).padStart(2, "0");
+            const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+            const month = monthNames[date.getMonth()];
+            const year = date.getFullYear();
+            
+            const hours = String(date.getHours()).padStart(2, "0");
+            const minutes = String(date.getMinutes()).padStart(2, "0");
+            const seconds = String(date.getSeconds()).padStart(2, "0");
+
+            return `${day}/${month}/${year} ${hours}:${minutes}:${seconds}`;
+        }
+
+        document.addEventListener("DOMContentLoaded", function() {
+            const elements = document.querySelectorAll(".localtime");
+            elements.forEach(element => {
+                const utcDatetime = element.textContent.trim(); 
+                const localDatetime = convertUTCToLocal(new Date(utcDatetime)); 
+                element.textContent = localDatetime;
+            });
+        });
     </script>
 </body>
 </html>

@@ -44,6 +44,7 @@
                         <th>Name</th>
                         <th>Venue</th>
                         <th>Event Date</th>
+                        <th>Booking Deadline</th>
                         <th>Capacity</th>
                         <th>Actions</th>
                     </tr>
@@ -55,6 +56,7 @@
                             <td><?= htmlspecialchars($event->getName()) ?></td>
                             <td><?= htmlspecialchars($event->getVenue()) ?></td>
                             <td><?= $event->getEventDate()->format('d/M/Y') ?></td>
+                            <td class="localtime"><?= $event->getBookingDeadline()->format(DateTime::ATOM) ?></td>
                             <td><?= $event->getCapacity() ?></td>
                             <td>
                                 <a href="<?=url("/event/{$event->getId()}")?>" class="btn btn-sm btn-info">View</a>

@@ -2,16 +2,17 @@
 
 namespace App\Controllers;
 
-use Core\Usecases\Attendee\ListAttendeesForEvent;
-use Core\Usecases\Event\CreateEvent;
-use Core\Usecases\Event\UpdateEvent;
-use Core\Usecases\Event\DeleteEvent;
-use Core\Usecases\Event\OrganizerListEvents;
-use Core\Usecases\Event\GetEventDetails;
+use DateTime;
 use Core\Usecases\Event\ListEvents;
-use Core\Usecases\Report\GenerateEventReport;
 use Core\Usecases\User\GetAuthUser;
 use Core\Usecases\User\GetUserById;
+use Core\Usecases\Event\CreateEvent;
+use Core\Usecases\Event\DeleteEvent;
+use Core\Usecases\Event\UpdateEvent;
+use Core\Usecases\Event\GetEventDetails;
+use Core\Usecases\Event\OrganizerListEvents;
+use Core\Usecases\Report\GenerateEventReport;
+use Core\Usecases\Attendee\ListAttendeesForEvent;
 
 class EventController
 {
@@ -67,7 +68,14 @@ class EventController
         $ticketPrice = $_POST['ticket_price'];
         $createdAt = (new \DateTime())->format('Y-m-d H:i:s');
 
+        // var_dump($_POST);
+        // http_response_code(400);
+        // exit;
+
         $errors = [];
+
+        $now = new DateTime();
+        $today = $now->format('Y-m-d');
 
         if (empty($name)) {
             $errors[] = "Event name is required.";
@@ -91,14 +99,28 @@ class EventController
             $errors[] = "Event date is required.";
         } elseif (!strtotime($eventDate)) {
             $errors[] = "Event date must be a valid date.";
+        } else {
+            $eventDateTime = new DateTime($eventDate);
+        
+            if ($eventDateTime->format('Y-m-d') < $today) {
+                $errors[] = "Event date cannot be in the past.";
+            }
         }
-
+        
         if (empty($bookingDeadline)) {
             $errors[] = "Booking deadline is required.";
         } elseif (!strtotime($bookingDeadline)) {
             $errors[] = "Booking deadline must be a valid date.";
-        } elseif (strtotime($bookingDeadline) > strtotime($eventDate)) {
-            $errors[] = "Booking deadline cannot be after the event date.";
+        } else {
+            $bookingDeadlineTime = new DateTime($bookingDeadline);
+        
+            if ($bookingDeadlineTime < $now) {
+                $errors[] = "Booking deadline cannot be in the past.";
+            }
+        
+            if ($bookingDeadlineTime->format('Y-m-d') > $eventDateTime->format('Y-m-d')) {
+                $errors[] = "Booking deadline cannot be after the event date.";
+            }
         }
 
         if (empty($venue)) {
@@ -160,6 +182,9 @@ class EventController
             $errors[] = $e->getMessage();
         }
 
+        $now = new DateTime();
+        $today = $now->format('Y-m-d');
+
         $name = $_POST['name'];
         $description = $_POST['description'];
         $capacity = $_POST['capacity'];
@@ -191,14 +216,28 @@ class EventController
             $errors[] = "Event date is required.";
         } elseif (!strtotime($eventDate)) {
             $errors[] = "Event date must be a valid date.";
+        } else {
+            $eventDateTime = new DateTime($eventDate);
+        
+            if ($eventDateTime->format('Y-m-d') < $today) {
+                $errors[] = "Event date cannot be in the past.";
+            }
         }
-
+        
         if (empty($bookingDeadline)) {
             $errors[] = "Booking deadline is required.";
         } elseif (!strtotime($bookingDeadline)) {
             $errors[] = "Booking deadline must be a valid date.";
-        } elseif (strtotime($bookingDeadline) > strtotime($eventDate)) {
-            $errors[] = "Booking deadline cannot be after the event date.";
+        } else {
+            $bookingDeadlineTime = new DateTime($bookingDeadline);
+        
+            if ($bookingDeadlineTime < $now) {
+                $errors[] = "Booking deadline cannot be in the past.";
+            }
+        
+            if ($bookingDeadlineTime->format('Y-m-d') > $eventDateTime->format('Y-m-d')) {
+                $errors[] = "Booking deadline cannot be after the event date.";
+            }
         }
 
         if (empty($venue)) {
@@ -353,6 +392,7 @@ class EventController
                         'id' => $attendee->getId(),
                         'name' => $attendee->getName(),
                         'email' => $attendee->getEmail(),
+                        'registered_at' => $attendee->getRegisteredAt()->format(\DateTime::ATOM),
                     ];
                 }
 
@@ -365,9 +405,9 @@ class EventController
                     'capacity' => $event->getCapacity(),
                     'venue' => $event->getVenue(),
                     'registration_fee' => $event->getTicketPrice(),
-                    'event_date' => $event->getEventDate()->format('d/M/Y'),
-                    'booking_deadline' => $event->getBookingDeadline()->format('d/M/Y'),
-                    'created_at' => $event->getCreatedAt()->format('d/M/Y h:i:s'),
+                    'event_date' => $event->getEventDate()->format(\DateTime::ATOM),
+                    'booking_deadline' => $event->getBookingDeadline()->format(\DateTime::ATOM),
+                    'created_at' => $event->getCreatedAt()->format(\DateTime::ATOM),
                     'attendee_count' => $event->getAttendeeCount(),
                     'organizer' => [
                         'id' => $organizer->getId(),
