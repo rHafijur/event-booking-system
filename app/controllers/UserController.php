@@ -8,23 +8,12 @@ use Core\Usecases\User\LogoutUser;
 
 class UserController
 {
-    private RegisterUser $registerUser;
-    private LoginUser $loginUser;
-    private LogoutUser $logoutUser;
-
-    public function __construct(RegisterUser $registerUser, LoginUser $loginUser, LogoutUser $logoutUser)
-    {
-        $this->registerUser = $registerUser;
-        $this->loginUser = $loginUser;
-        $this->logoutUser = $logoutUser;
-    }
-
     public function registerView(): void
     {
         require __DIR__."/../../presentation/views/auth/register.php";
     }
 
-    public function register(): void
+    public function register(RegisterUser $registerUser): void
     {
         $name = $_POST['name'];
         $email = $_POST['email'];
@@ -58,7 +47,7 @@ class UserController
         }
 
         try {
-            $this->registerUser->execute($name, $email, $password);
+            $registerUser->execute($name, $email, $password);
             setFlashMessage('success','Registration successfull');
             $location = url('/login');
             header("Location: $location");
@@ -76,13 +65,13 @@ class UserController
         require __DIR__."/../../presentation/views/auth/login.php";
     }
 
-    public function login(): void
+    public function login(LoginUser $loginUser): void
     {
         $email = $_POST['email'];
         $password = $_POST['password'];
 
         try {
-            $result = $this->loginUser->execute($email, $password);
+            $result = $loginUser->execute($email, $password);
             $location = url('/dashboard');
             header("Location: $location");
         } catch (\Exception $e) {
@@ -93,9 +82,9 @@ class UserController
         }
     }
 
-    public function logout(): void
+    public function logout(LogoutUser $logoutUser): void
     {
-        $this->logoutUser->execute();
+        $logoutUser->execute();
         $location = url('/login');
         header("Location: $location");
     }

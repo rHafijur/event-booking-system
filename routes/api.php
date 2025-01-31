@@ -1,11 +1,9 @@
 <?php
 
+use Infrastructure\Container;
 use App\Factories\ControllerFactory;
 
 $router['GET /api/events'] =  function (): void {
         $controller = ControllerFactory::getEventController();
-        $controller->listForApi();
+        Container::getInstance()->call($controller, 'listForApi');
     };
-
-    // var_dump($router);
-    // exit;

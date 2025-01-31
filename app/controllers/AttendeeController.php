@@ -10,27 +10,10 @@ use DateTime;
 
 class AttendeeController
 {
-    private RegisterAttendee $registerAttendee;
-    private ListAttendeesForEvent $listAttendeesForEvent;
-    private GetEventDetails $getEventDetails;
-    private FindEventAttendeeByEmail $findEventAttendeeByEmail;
-
-    public function __construct(
-        RegisterAttendee $registerAttendee,
-        ListAttendeesForEvent $listAttendeesForEvent,
-        GetEventDetails $getEventDetails,
-        FindEventAttendeeByEmail $findEventAttendeeByEmail
-    ) {
-        $this->registerAttendee = $registerAttendee;
-        $this->listAttendeesForEvent = $listAttendeesForEvent;
-        $this->getEventDetails = $getEventDetails;
-        $this->findEventAttendeeByEmail = $findEventAttendeeByEmail;
-    }
-
-    public function registerView(int $eventId): void
+    public function registerView(int $eventId, GetEventDetails $getEventDetails): void
     {
         try{
-            $event = $this->getEventDetails->execute($eventId);
+            $event = $getEventDetails->execute($eventId);
             if($event->getBookingDeadline()->getTimestamp()< (new DateTime())->getTimestamp()){
                 throw new \Exception("Booking Deadline Expired");
             }
@@ -42,7 +25,7 @@ class AttendeeController
         require __DIR__."/../../presentation/views/attendees/register.php";
     }
 
-    public function register(): void
+    public function register(FindEventAttendeeByEmail $findEventAttendeeByEmail, GetEventDetails $getEventDetails, RegisterAttendee $registerAttendee): void
     {
         $eventId = $_POST['event_id'];
         $name = $_POST['name'];
@@ -62,13 +45,13 @@ class AttendeeController
             $errors[] = "Given email is invalid.";
         }
 
-        $existingAttendees = $this->findEventAttendeeByEmail->execute($eventId, $email);
+        $existingAttendees = $findEventAttendeeByEmail->execute($eventId, $email);
         
         if(count($existingAttendees)){
             $errors[] = "Email is already registered in this event.";
         }
 
-        $event = $this->getEventDetails->execute($eventId);
+        $event = $getEventDetails->execute($eventId);
 
 
         if($event->availableTicketCount() < 1){
@@ -86,7 +69,7 @@ class AttendeeController
         }
 
         try {
-            $this->registerAttendee->execute($event->getId(), $name, $email, new DateTime());
+            $registerAttendee->execute($event->getId(), $name, $email, new DateTime());
             echo json_encode([
                 'event_name' => $event->getName(),
                 'venue' => $event->getVenue(),
@@ -99,10 +82,10 @@ class AttendeeController
         }
     }
 
-    public function list(int $eventId): void
+    public function list(int $eventId, ListAttendeesForEvent $listAttendeesForEvent): void
     {
         try {
-            $attendees = $this->listAttendeesForEvent->execute($eventId);
+            $attendees = $listAttendeesForEvent->execute($eventId);
             require '/../../presentation/views/attendees/list.php';
         } catch (\Exception $e) {
             echo "Error: " . $e->getMessage();

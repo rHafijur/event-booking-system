@@ -21,6 +21,7 @@
             "App\\Controllers\\": "app/controllers/",
             "App\\Factories\\": "app/factories/",
             "App\\Middlewares\\": "app/middlewares/",
+            "Infrastructure\\": "infrastructure/",
             "Infrastructure\\Config\\": "infrastructure/config/",
             "Infrastructure\\Database\\": "infrastructure/database/",
             "Infrastructure\\Database\\Migrations\\": "infrastructure/database/migrations/",

@@ -1,9 +1,10 @@
 <?php
 namespace App\Factories;
 
-use Infrastructure\Database\Seeders\UserSeeder;
 use PDO;
+use Infrastructure\Container;
 use Infrastructure\Database\Database;
+use Infrastructure\Database\Seeders\UserSeeder;
 use Infrastructure\Repositories\MySQLUserRepository;
 
 class SeederFactory
@@ -19,8 +20,9 @@ class SeederFactory
         return new MySQLUserRepository($db);
     }
 
-    public static function getUserSeeder()
+    public static function getUserSeeder(): UserSeeder
     {
-        return new UserSeeder(static::getUserRepository(static::getDbConn()));
+        // return new UserSeeder(static::getUserRepository(static::getDbConn()));
+        return Container::getInstance()->resolve(UserSeeder::class);
     }
 }

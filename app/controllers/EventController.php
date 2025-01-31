@@ -16,40 +16,7 @@ use Core\Usecases\Attendee\ListAttendeesForEvent;
 
 class EventController
 {
-    private CreateEvent $createEvent;
-    private UpdateEvent $updateEvent;
-    private DeleteEvent $deleteEvent;
-    private OrganizerListEvents $organizerListEvents;
-    private ListEvents $listEvents;
-    private GetEventDetails $getEventDetails;
-    private ListAttendeesForEvent $listAttendeesForEvent;
-    private GetAuthUser $getAuthUser;
-    private GenerateEventReport $generateEventReport;
-    private GetUserById $getUserById;
-
-    public function __construct(
-        CreateEvent $createEvent,
-        UpdateEvent $updateEvent,
-        DeleteEvent $deleteEvent,
-        OrganizerListEvents $organizerListEvents,
-        ListEvents $listEvents,
-        GetEventDetails $getEventDetails,
-        ListAttendeesForEvent $listAttendeesForEvent,
-        GetAuthUser $getAuthUser,
-        GenerateEventReport $generateEventReport,
-        GetUserById $getUserById
-    ) {
-        $this->createEvent = $createEvent;
-        $this->updateEvent = $updateEvent;
-        $this->deleteEvent = $deleteEvent;
-        $this->organizerListEvents = $organizerListEvents;
-        $this->listEvents = $listEvents;
-        $this->getEventDetails = $getEventDetails;
-        $this->listAttendeesForEvent = $listAttendeesForEvent;
-        $this->getAuthUser = $getAuthUser;
-        $this->generateEventReport = $generateEventReport;
-        $this->getUserById = $getUserById;
-    }
+    function __construct(private GetAuthUser $getAuthUser){}
 
     public function createView(): void
     {
@@ -57,7 +24,7 @@ class EventController
         require __DIR__."/../../presentation/views/events/create.php";
     }
 
-    public function create(): void
+    public function create(CreateEvent $createEvent): void
     {
         $name = $_POST['name'];
         $description = $_POST['description'];
@@ -66,7 +33,7 @@ class EventController
         $bookingDeadline = $_POST['booking_deadline'];
         $venue = $_POST['venue'];
         $ticketPrice = $_POST['ticket_price'];
-        $createdAt = (new \DateTime())->format('Y-m-d H:i:s');
+        $createdAt = (new DateTime())->format('Y-m-d H:i:s');
 
         // var_dump($_POST);
         // http_response_code(400);
@@ -150,7 +117,7 @@ class EventController
         $user = $this->getAuthUser->execute();
 
         try {
-            $this->createEvent->execute($name, $description, $capacity, $eventDate, $bookingDeadline, $image, $venue, $ticketPrice, $user->getId(), $createdAt);
+            $createEvent->execute($name, $description, $capacity, $eventDate, $bookingDeadline, $image, $venue, $ticketPrice, $user->getId(), $createdAt);
             echo 'okay';
         } catch (\Exception $e) {
             http_response_code(500);
@@ -158,11 +125,11 @@ class EventController
         }
     }
 
-    public function edit(int $id): void
+    public function edit(int $id, GetEventDetails $getEventDetails): void
     {
         try {
             $user = $this->getAuthUser->execute();
-            $event = $this->getEventDetails->execute($id, $user->getId());
+            $event = $getEventDetails->execute($id, $user->getId());
         } catch (\Exception $e) {
             echo "Error: " . $e->getMessage();
             exit;
@@ -170,13 +137,13 @@ class EventController
         require __DIR__."/../../presentation/views/events/edit.php";
     }
 
-    public function update(int $eventId): void
+    public function update(int $eventId, GetEventDetails $getEventDetails, UpdateEvent $updateEvent): void
     {
         $errors = [];
         $previousImage = null;
         try {
             $user = $this->getAuthUser->execute();
-            $event = $this->getEventDetails->execute($eventId, $user->getId());
+            $event = $getEventDetails->execute($eventId, $user->getId());
             $previousImage = $event->getImage();
         } catch (\Exception $e) {
             $errors[] = $e->getMessage();
@@ -272,7 +239,7 @@ class EventController
         }
 
         try {
-            $this->updateEvent->execute($eventId, $name, $description, $capacity, $eventDate, $bookingDeadline, $image, $venue, $ticketPrice);
+            $updateEvent->execute($eventId, $name, $description, $capacity, $eventDate, $bookingDeadline, $image, $venue, $ticketPrice);
             
             if($shouldDeleteThePreviousImage){
                 try{
@@ -286,12 +253,12 @@ class EventController
         }
     }
 
-    public function delete(int $eventId): void
+    public function delete(int $eventId, GetEventDetails $getEventDetails, DeleteEvent $deleteEvent): void
     {
         try {
             $user = $this->getAuthUser->execute();
-            $event = $this->getEventDetails->execute($eventId, $user->getId());
-            $this->deleteEvent->execute($event->getId());
+            $event = $getEventDetails->execute($eventId, $user->getId());
+            $deleteEvent->execute($event->getId());
             setFlashMessage('success', "Event deleted successfully");
             $location = url('/events');
             header("Location: $location");
@@ -300,7 +267,7 @@ class EventController
         }
     }
 
-    public function list(): void
+    public function list(ListEvents $listEvents, OrganizerListEvents $organizerListEvents): void
     {
         $page = $_GET['page'] ?? 1;
         $pageSize = $_GET['page_size'] ?? 10;
@@ -311,9 +278,9 @@ class EventController
 
         try {
             if($user->isAdmin()){
-                $res = $this->listEvents->execute($page, $pageSize, $search, $orderBy);
+                $res = $listEvents->execute($page, $pageSize, $search, $orderBy);
             }else{
-                $res = $this->organizerListEvents->execute($user->getId(),$page, $pageSize, $search, $orderBy);
+                $res = $organizerListEvents->execute($user->getId(),$page, $pageSize, $search, $orderBy);
             }
             
             [$events, $totalRecords, $totalPages, $currentPage] = array_values($res);
@@ -323,35 +290,35 @@ class EventController
         }
     }
 
-    public function details(int $eventId): void
+    public function details(int $eventId, GetEventDetails $getEventDetails, ListAttendeesForEvent $listAttendeesForEvent): void
     {
         try {
             $user = $this->getAuthUser->execute();
 
             if($user->isAdmin()){
-                $event = $this->getEventDetails->execute($eventId);
+                $event = $getEventDetails->execute($eventId);
             }else{
-                $event = $this->getEventDetails->execute($eventId, $user->getId());
+                $event = $getEventDetails->execute($eventId, $user->getId());
             }
-            $attendees = $this->listAttendeesForEvent->execute($eventId);
+            $attendees = $listAttendeesForEvent->execute($eventId);
             require __DIR__.'/../../presentation/views/events/details.php';
         } catch (\Exception $e) {
             echo "Error: " . $e->getMessage();
         }
     }
 
-    public function downloadAttendeesReport(int $eventId): void
+    public function downloadAttendeesReport(int $eventId, GetEventDetails $getEventDetails, GenerateEventReport $generateEventReport): void
     {
         try {
             $user = $this->getAuthUser->execute();
 
             if($user->isAdmin()){
-                $event = $this->getEventDetails->execute($eventId);
+                $event = $getEventDetails->execute($eventId);
             }else{
-                $event = $this->getEventDetails->execute($eventId, $user->getId());
+                $event = $getEventDetails->execute($eventId, $user->getId());
             }
             $filename = strtolower(str_replace(' ', '_', $event->getName())).(new \DateTime())->format('d_m_Y_H_i_s').".csv";
-            $data = $this->generateEventReport->execute($eventId);
+            $data = $generateEventReport->execute($eventId);
 
             header('Content-Type: text/csv');
             header('Content-Disposition: attachment; filename="'.$filename.'"');
@@ -368,7 +335,7 @@ class EventController
         }
     }
 
-    public function listForApi(): void
+    public function listForApi(ListEvents $listEvents, ListAttendeesForEvent $listAttendeesForEvent, GetUserById $getUserById): void
     {
         $page = $_GET['page'] ?? 1;
         $pageSize = $_GET['page_size'] ?? 10;
@@ -378,13 +345,13 @@ class EventController
         header("Content-type: application/json; charset=utf-8");
 
         try{
-            $res = $this->listEvents->execute($page, $pageSize, $search, $orderBy);
+            $res = $listEvents->execute($page, $pageSize, $search, $orderBy);
             [$events, $totalRecords, $totalPages, $currentPage] = array_values($res);
 
             $data = [];
 
             foreach($events as $event){
-                $attendees = $this->listAttendeesForEvent->execute($event->getId());
+                $attendees = $listAttendeesForEvent->execute($event->getId());
                 $event->setAttendeeCount(count($attendees));
                 $attendeeData = [];
                 foreach($attendees as $attendee){
@@ -392,11 +359,11 @@ class EventController
                         'id' => $attendee->getId(),
                         'name' => $attendee->getName(),
                         'email' => $attendee->getEmail(),
-                        'registered_at' => $attendee->getRegisteredAt()->format(\DateTime::ATOM),
+                        'registered_at' => $attendee->getRegisteredAt()->format(DateTime::ATOM),
                     ];
                 }
 
-                $organizer = $this->getUserById->execute($event->getOrganizerId());
+                $organizer = $getUserById->execute($event->getOrganizerId());
 
                 $data[] = [
                     'id' => $event->getId(),
@@ -405,9 +372,9 @@ class EventController
                     'capacity' => $event->getCapacity(),
                     'venue' => $event->getVenue(),
                     'registration_fee' => $event->getTicketPrice(),
-                    'event_date' => $event->getEventDate()->format(\DateTime::ATOM),
-                    'booking_deadline' => $event->getBookingDeadline()->format(\DateTime::ATOM),
-                    'created_at' => $event->getCreatedAt()->format(\DateTime::ATOM),
+                    'event_date' => $event->getEventDate()->format(DateTime::ATOM),
+                    'booking_deadline' => $event->getBookingDeadline()->format(DateTime::ATOM),
+                    'created_at' => $event->getCreatedAt()->format(DateTime::ATOM),
                     'attendee_count' => $event->getAttendeeCount(),
                     'organizer' => [
                         'id' => $organizer->getId(),

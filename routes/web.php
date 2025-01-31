@@ -1,10 +1,10 @@
 <?php
 
-use App\Factories\ControllerFactory;
+use Infrastructure\Container;
 use App\Factories\SeederFactory;
-use App\Middlewares\AuthenticatedMiddleware;
-use App\Middlewares\AdminMiddleware;
 use App\Middlewares\CsrfProtection;
+use App\Factories\ControllerFactory;
+use App\Middlewares\AuthenticatedMiddleware;
 use Infrastructure\Database\Migrations\CreateUsersTable, Infrastructure\Database\Migrations\CreateEventsTable, Infrastructure\Database\Migrations\CreateAttendeesTable;
 
 function applyMiddleware(array $middlewares, callable $callback)
@@ -26,45 +26,46 @@ $router = [
         CreateAttendeesTable::up();
     },
     // This route is to seed the users, GUID for simple security 😇
-    'GET /dbseed/3e5b4559-508f-4daa-b790-928740657bd7' => function (): void {
-        SeederFactory::getUserSeeder()->run();
+    'GET /db-seed/3e5b4559-508f-4daa-b790-928740657bd7' => function (): void {
+        $seeder = SeederFactory::getUserSeeder();
+        Container::getInstance()->call($seeder, 'run');
     },
     'GET /' => function (): void {
         $controller = ControllerFactory::getLandingPageController();
-        $controller->index();
+        Container::getInstance()->call($controller, 'index');
     },
     // User Authentication
     'GET /login' => function (): void {
         $controller = ControllerFactory::getUserController();
-        $controller->loginView();
+        Container::getInstance()->call($controller, 'loginView');
     },
     'POST /login' => function (): void {
         applyMiddleware([CsrfProtection::class], function (): void {
             $controller = ControllerFactory::getUserController();
-            $controller->login();
+            Container::getInstance()->call($controller, 'login');
         });
     },
     'GET /logout' => function (): void {
         applyMiddleware([AuthenticatedMiddleware::class], function (): void {
             $controller = ControllerFactory::getUserController();
-            $controller->logout();
+            Container::getInstance()->call($controller, 'logout');
         });
     },
     'GET /register' => function (): void {
         $controller = ControllerFactory::getUserController();
-        $controller->registerView();
+        Container::getInstance()->call($controller, 'registerView');
     },
     'POST /register' => function (): void {
         applyMiddleware([CsrfProtection::class], function (): void {
             $controller = ControllerFactory::getUserController();
-            $controller->register();
+            Container::getInstance()->call($controller, 'register');
         });
     },
 
     'GET /dashboard' => function (): void {
         applyMiddleware([AuthenticatedMiddleware::class], function (): void {
             $controller = ControllerFactory::getDashboardController();
-            $controller->index();
+            Container::getInstance()->call($controller, 'index');
         });
     },
 
@@ -72,59 +73,59 @@ $router = [
     'GET /events' => function (): void {
         applyMiddleware([AuthenticatedMiddleware::class], function (): void {
             $controller = ControllerFactory::getEventController();
-            $controller->list();
+            Container::getInstance()->call($controller, 'list');
         });
     },
     'GET /event/create' => function (): void {
         applyMiddleware([AuthenticatedMiddleware::class], function (): void {
             $controller = ControllerFactory::getEventController();
-            $controller->createView();
+            Container::getInstance()->call($controller, 'createView');
         });
     },
     'POST /event/create' => function (): void {
         applyMiddleware([AuthenticatedMiddleware::class, CsrfProtection::class], function (): void {
             $controller = ControllerFactory::getEventController();
-            $controller->create();
+            Container::getInstance()->call($controller, 'create');
         });
     },
     'GET /event/{id}' => function (array $params): void {
         applyMiddleware([AuthenticatedMiddleware::class], function () use ($params): void {
             $controller = ControllerFactory::getEventController();
-            $controller->details($params['id']);
+            Container::getInstance()->call($controller, 'details', ['eventId' => $params['id']]);
         });
     },
     'GET /event/{id}/download-attendees-report' => function (array $params): void {
         applyMiddleware([AuthenticatedMiddleware::class], function () use ($params): void {
             $controller = ControllerFactory::getEventController();
-            $controller->downloadAttendeesReport($params['id']);
+            Container::getInstance()->call($controller, 'downloadAttendeesReport', ['eventId' => $params['id']]);
         });
     },
     'GET /event/{id}/edit' => function (array $params): void {
         applyMiddleware([AuthenticatedMiddleware::class], function () use ($params): void {
             $controller = ControllerFactory::getEventController();
-            $controller->edit($params['id']);
+            Container::getInstance()->call($controller, 'edit', ['id' => $params['id']]);
         });
     },
     'POST /event/{id}/update' => function (array $params): void {
         applyMiddleware([AuthenticatedMiddleware::class, CsrfProtection::class], function () use ($params): void {
             $controller = ControllerFactory::getEventController();
-            $controller->update($params['id']);
+            Container::getInstance()->call($controller, 'update', ['eventId' => $params['id']]);
         });
     },
     'POST /event/{id}/delete' => function (array $params): void {
         applyMiddleware([AuthenticatedMiddleware::class, CsrfProtection::class], function () use ($params): void {
             $controller = ControllerFactory::getEventController();
-            $controller->delete($params['id']);
+            Container::getInstance()->call($controller, 'delete', ['eventId' => $params['id']]);
         });
     },
     'GET /event/{id}/register' => function (array $params): void {
         $controller = ControllerFactory::getAttendeeController();
-        $controller->registerView($params['id']);
+        Container::getInstance()->call($controller, 'registerView', ['eventId' => $params['id']]);
     },
     'POST /attendee/register' => function (array $params): void {
         applyMiddleware([CsrfProtection::class], function () use ($params): void {
             $controller = ControllerFactory::getAttendeeController();
-            $controller->register();
+            Container::getInstance()->call($controller, 'register');
         });
     },
 ];
