@@ -63,12 +63,21 @@
 
 
             <div class="d-flex justify-content-end">
-                <button type="submit" class="btn btn-primary">Create Event</button>
+                <button id="createEventButton" type="submit" class="btn btn-primary">Create Event</button>
             </div>
         </form>
     </div>
 
     <script>
+        function setCreateEventButtonState(isActive){
+            const button = document.getElementById('createEventButton');
+            if(isActive){
+                button.removeAttribute('disabled');
+            }else{
+                button.setAttribute('disabled', true);
+            }
+        }
+
         document.getElementById('eventForm').addEventListener('submit', function (e) {
             e.preventDefault();
 
@@ -80,6 +89,8 @@
             const formData = new FormData(this);
             
             formData.set('booking_deadline', localTimeToUTC(formData.get('booking_deadline')));
+
+            setCreateEventButtonState(false);
 
             fetch('<?=url("/event/create")?>', {
                 method: 'POST',
@@ -98,6 +109,7 @@
                                 showToast(err, 'danger');
                             }
                         });
+                        setCreateEventButtonState(true);
                     }
                 })
                 .catch(() => {
