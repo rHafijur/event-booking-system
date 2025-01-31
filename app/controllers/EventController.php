@@ -259,6 +259,9 @@ class EventController
             $user = $this->getAuthUser->execute();
             $event = $getEventDetails->execute($eventId, $user->getId());
             $deleteEvent->execute($event->getId());
+            try{
+                deleteFile($event->getImage());
+            }catch(\Exception $_){}
             setFlashMessage('success', "Event deleted successfully");
             $location = url('/events');
             header("Location: $location");

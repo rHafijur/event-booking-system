@@ -104,6 +104,12 @@ function uploadImage($uploadPath, $inputName) {
         throw new Exception("File upload error: " . $_FILES[$inputName]["error"]);
     }
 
+    $maxFileSize = 2 * 1024 * 1024; 
+
+    if ($_FILES[$inputName]["size"] > $maxFileSize) {
+        throw new Exception("File max size limit (2MB) exceeds!");
+    }
+
     $fileType = strtolower(pathinfo($_FILES[$inputName]["name"], PATHINFO_EXTENSION));
     $allowedTypes = ["jpg", "jpeg", "png", "gif"];
 
