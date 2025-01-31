@@ -116,4 +116,9 @@ Follow these steps to set up the system:
 
 ---
 
+## User Manual
+
+For a detailed user guide, please read the [User Manual](USER_MANUAL.md).
+
+
 
