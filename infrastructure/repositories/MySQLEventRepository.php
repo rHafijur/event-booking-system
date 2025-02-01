@@ -73,9 +73,11 @@ class MySQLEventRepository implements EventRepository
             $countQuery .= $organizerCondition;
         }
 
+        $query.= " GROUP BY events.id";
+
         if (!empty($orderBy)) {
             [$column, $direction] = explode('-', $orderBy, 2) + [null, null];
-            $allowedColumns = ['name', 'event_date', 'capacity'];
+            $allowedColumns = ['name', 'event_date', 'capacity', 'created_at'];
             $allowedDirections = ['ASC', 'DESC'];
 
             if (in_array($column, $allowedColumns, true) && in_array($direction, $allowedDirections, true)) {
@@ -83,7 +85,7 @@ class MySQLEventRepository implements EventRepository
             }
         }
 
-        $query .= " GROUP BY events.id LIMIT :offset, :limit";
+        $query .= " LIMIT :offset, :limit";
 
 
         $countStmt = $this->db->prepare($countQuery);
