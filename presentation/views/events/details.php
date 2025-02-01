@@ -29,7 +29,7 @@
                             <button type="submit" class="btn btn-danger">Delete Event</button>
                         </form>
                     <?php endif ?>
-                    <a href="<?=url("/event/{$event->getId()}/download-attendees-report")?>" class="btn btn-sm btn-info">Download Attendee List</a>
+                    <a href="<?=url("/event/{$event->getId()}/download-attendees-report")?>" class="btn btn-info">Download Attendee List</a>
                 </div>
             </div>
         </div>

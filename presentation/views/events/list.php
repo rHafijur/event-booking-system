@@ -59,15 +59,15 @@
                             <td class="localtime"><?= $event->getBookingDeadline()->format(DateTime::ATOM) ?></td>
                             <td><?= $event->getCapacity() ?></td>
                             <td>
-                                <a href="<?=url("/event/{$event->getId()}")?>" class="btn btn-sm btn-info">View</a>
+                                <a href="<?=url("/event/{$event->getId()}")?>" class="m-1 btn btn-sm btn-primary">View</a>
                                 <?php if(!$user->isAdmin()): ?>
-                                    <a href="<?=url("/event/{$event->getId()}/edit")?>" class="btn btn-sm btn-warning">Edit</a>
+                                    <a href="<?=url("/event/{$event->getId()}/edit")?>" class="m-1 btn btn-sm btn-warning">Edit</a>
                                     <form onsubmit="deleteEvent(event)" method="POST" action="<?=url("/event/{$event->getId()}/delete")?>" class="d-inline">
                                         <input type="hidden" name="_csrf_token" value="<?php echo $GLOBALS['csrf_token'] ?? ''; ?>">
-                                        <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                                        <button type="submit" class="m-1 btn btn-sm btn-danger">Delete</button>
                                     </form>
                                 <?php endif ?>
-                                <a href="<?=url("/event/{$event->getId()}/download-attendees-report")?>" class="btn btn-sm btn-info">Download Attendee List</a>
+                                <a href="<?=url("/event/{$event->getId()}/download-attendees-report")?>" class="m-1 btn btn-sm btn-info">Download Attendee List</a>
                             </td>
                         </tr>
                     <?php endforeach ?>
@@ -81,7 +81,7 @@
         </div>
 
         <!-- Pagination -->
-        <?= renderPaginationWithQueryParams($currentPage, $totalPages, '/events', $_GET) ?>
+        <?= renderPaginationWithQueryParams($currentPage, $totalPages, url('/events'), $_GET) ?>
     </div>
 
     <script>

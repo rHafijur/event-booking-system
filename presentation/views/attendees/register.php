@@ -118,7 +118,7 @@
             const ticketContent = document.querySelector('#ticketModal .modal-body').innerHTML;
 
             // Create a temporary print section
-            const printWindow = window.open('', '_blank', 'width=800,height=600');
+            const printWindow = window.open('', '_blank');
             printWindow.document.write(`
                 <html>
                     <head>
